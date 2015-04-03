@@ -249,11 +249,7 @@ function relation_type_uri(Drupal\relation\RelationTypeInterface $relation_type)
  * @param int|null $entity_id
  *   (optional) The entity id of one of the endpoints. Can also be an array of
  *   entity IDs.
-<<<<<<< HEAD
- * @param $delta
-=======
- * @param int|null $r_index
->>>>>>> 8.x-1.x
+ * @param int|null $delta
  *   (optional) The index of the search entity in the relation to be found
  *   (0 = source, 1 = target).
  *
@@ -279,11 +275,7 @@ function relation_query($entity_type = NULL, $entity_id = NULL, $delta = NULL) {
  *   Entity type of the related entity.
  * @param int $entity_id
  *   Entity id of the related entity. Can be an array of entity IDs.
-<<<<<<< HEAD
- * @param $delta
-=======
- * @param int|null $r_index
->>>>>>> 8.x-1.x
+ * @param int|null $delta
  *   The index of the related entity within the requested relation(s).
  *
  * @todo rename. / extend class ala RelationQuery::related()
@@ -291,12 +283,7 @@ function relation_query($entity_type = NULL, $entity_id = NULL, $delta = NULL) {
  * @return Drupal\Core\Entity\Query\QueryInterface
  *   The query object
  */
-<<<<<<< HEAD
-function relation_query_add_related(Drupal\Core\Entity\Query\QueryInterface $query, $entity_type, $entity_id, $delta = NULL) {
-  $delta_condition = isset($delta) ? "$delta." : '';
-=======
-function relation_query_add_related(QueryInterface $query, $entity_type, $entity_id, $r_index = NULL) {
->>>>>>> 8.x-1.x
+function relation_query_add_related(QueryInterface $query, $entity_type, $entity_id, $delta = NULL) {
   $group = $query->andConditionGroup()
     ->condition("endpoints.{$delta_condition}target_type", $entity_type, '=')
     ->condition("endpoints.{$delta_condition}target_id", $entity_id, NULL);
@@ -319,11 +306,7 @@ function relation_query_add_related(QueryInterface $query, $entity_type, $entity
  *   The entity id of one of the endpoints.
  * @param string|null $relation_type
  *   (optional) The relation type of the relation to find.
-<<<<<<< HEAD
- * @param $delta
-=======
- * @param int|null $r_index
->>>>>>> 8.x-1.x
+ * @param int|null $delta
  *   (optional) The index of the search entity in the relation to be found
  *   (0 = source, 1 = target).
  *

@@ -6,7 +6,6 @@ entity.relation.canonical:
   requirements:
     _entity_access: 'relation.view'
 
-<<<<<<< HEAD
 entity.relation.add_page:
   path: '/relation/add'
   defaults:

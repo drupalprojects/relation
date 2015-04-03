@@ -272,13 +272,8 @@ class RelationViewsTest extends RelationTestBase {
       return;
     }
 
-<<<<<<< HEAD
     for ($delta = -1; $delta < 2; $delta++) {
-      $view = new view;
-=======
-    for ($r_index = -1; $r_index < 2; $r_index++) {
       $view = new view();
->>>>>>> 8.x-1.x
       $view->base_table = 'node';
       $handler = $view->new_display('default');
       $handler->display->display_options['relationships']['relation_directional_entitysame_node']['id'] = 'relation_directional_entitysame_node';
@@ -341,15 +336,9 @@ class RelationViewsTest extends RelationTestBase {
    *
    * @TODO
    */
-<<<<<<< HEAD
-  function todo_testReverseDirectionalSameEntityRelations() {
-    for ($delta = -1; $delta < 2; $delta++) {
-      $view = new view;
-=======
   public function todoTestReverseDirectionalSameEntityRelations() {
-    for ($r_index = -1; $r_index < 2; $r_index++) {
+    for ($delta = -1; $delta < 2; $delta++) {
       $view = new view();
->>>>>>> 8.x-1.x
       $view->base_table = 'node';
       $handler = $view->new_display('default');
       $handler->display->display_options['relationships']['relation_directional_entitysame_node']['id'] = 'relation_directional_entitysame_node';
@@ -412,15 +401,9 @@ class RelationViewsTest extends RelationTestBase {
    *
    * @TODO
    */
-<<<<<<< HEAD
-  function todo_testForwardDirectionalDifferentEntityRelations() {
-    for ($delta = -1; $delta < 2; $delta++) {
-      $view = new view;
-=======
   public function todoTestForwardDirectionalDifferentEntityRelations() {
-    for ($r_index = -1; $r_index < 2; $r_index++) {
+    for ($delta = -1; $delta < 2; $delta++) {
       $view = new view();
->>>>>>> 8.x-1.x
       $view->base_table = 'users';
       $handler = $view->new_display('default');
       $handler->display->display_options['relationships']['relation_directional_entitydifferent_node']['id'] = 'relation_directional_entitydifferent_node';
@@ -480,15 +463,9 @@ class RelationViewsTest extends RelationTestBase {
    *
    * @TODO
    */
-<<<<<<< HEAD
-  function todo_testReverseDirectionalDifferentEntityRelations() {
-    for ($delta = -1; $delta < 2; $delta++) {
-      $view = new view;
-=======
   public function todoTestReverseDirectionalDifferentEntityRelations() {
-    for ($r_index = -1; $r_index < 2; $r_index++) {
+    for ($delta = -1; $delta < 2; $delta++) {
       $view = new view();
->>>>>>> 8.x-1.x
       $view->base_table = 'node';
       $handler = $view->new_display('default');
       $handler->display->display_options['relationships']['relation_directional_entitydifferent_user']['id'] = 'relation_directional_entitydifferent_user';
