@@ -42,7 +42,7 @@ interface RelationInterface extends ContentEntityInterface {
   public function endpoints();
 
   /**
-   * Gets the label of the relation type of the given relation
+   * Gets the label of the relation type of the given relation.
    *
    * @param $relation
    *   A relation object.

@@ -45,15 +45,14 @@ class RelationListBuilder extends EntityListBuilder {
 
     $bundle = entity_load($entity->getEntityType()->getBundleEntityType(), $entity->bundle());
     $row['relation_type']['data'] = array(
-        '#type' => 'link',
+      '#type' => 'link',
       '#title' => $this->getLabel($bundle),
     ) + $bundle->urlInfo()->toRenderArray();
 
-    // Sort entities by their type
+    // Sort entities by their type.
     foreach ($entity->endpoints as $endpoint) {
       $entities[$endpoint->entity_type][] = $endpoint->entity_id;
     }
-
 
     $relation_entities = array();
     $entity_count_total = 0;
@@ -70,7 +69,7 @@ class RelationListBuilder extends EntityListBuilder {
     }
 
     if ($entity_count_total != $entity_count) {
-      $relation_entities[] =\Drupal::translation()->formatPlural(
+      $relation_entities[] = \Drupal::translation()->formatPlural(
         $entity_count_total - $entity_count,
         'Missing @count entity',
         'Missing @count entities'

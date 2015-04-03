@@ -215,7 +215,8 @@ function relation_rules_load_related_info_alter(&$element_info, $element) {
     );
     if (!empty($element->settings['entity_type_op'])) {
       // Set the returned entity type so we can access all the data.
-      $element_info['provides']['endpoints']['type'] = 'list<' . $element->settings['entity_type_op'] . '>'; // more then one.
+      $element_info['provides']['endpoints']['type'] = 'list<' . $element->settings['entity_type_op'] . '>';
+      // More then one.
     }
   }
 }
@@ -284,7 +285,7 @@ function relation_rules_load_related($source_entity, $relation_type, $entity_typ
  */
 function relation_rules_fetch_endpoint_type_options(RulesAbstractPlugin $element, $param_name = NULL) {
   $options = $types = array();
-  // The parameter is optional
+  // The parameter is optional.
   if ($param_name = 'entity_type_op') {
     $options[''] = t('--All types--');
   }
@@ -300,17 +301,17 @@ function relation_rules_fetch_endpoint_type_options(RulesAbstractPlugin $element
   }
 
   foreach (entity_load_multiple('relation_type') as $relation_type) {
-    // Add the allowed source entity types to the list
+    // Add the allowed source entity types to the list.
     if (!empty($relation_type->source_bundles)) {
       foreach ($relation_type->source_bundles as $source_bundle) {
-        list($entity_type, ) = explode(':', $source_bundle, 2);
+        list($entity_type,) = explode(':', $source_bundle, 2);
         $options[$entity_type] = $all_entity_types[$entity_type];
       }
     }
-    // Add the allowed target entity types to the list
+    // Add the allowed target entity types to the list.
     if (!empty($relation_type->target_bundles)) {
       foreach ($relation_type->target_bundles as $target_bundle) {
-        list($entity_type, ) = explode(':', $target_bundle, 2);
+        list($entity_type,) = explode(':', $target_bundle, 2);
         $options[$entity_type] = $all_entity_types[$entity_type];
       }
     }
@@ -342,10 +343,12 @@ function relation_rules_fetch_endpoint_info_alter(&$element_info, $element) {
       );
       // Set the returned entity type so we can access all the data.
       if (!empty($element->settings['number']) && (1 == $element->settings['number'])) {
-        $element_info['provides']['endpoint_fetched']['type'] = $element->settings['entity_type']; // only one.
+        $element_info['provides']['endpoint_fetched']['type'] = $element->settings['entity_type'];
+        // Only one.
       }
       else {
-        $element_info['provides']['endpoint_fetched']['type'] = 'list<' . $element->settings['entity_type'] . '>'; // more then one.
+        $element_info['provides']['endpoint_fetched']['type'] = 'list<' . $element->settings['entity_type'] . '>';
+        // More then one.
       }
     }
   }
@@ -420,7 +423,7 @@ function relation_rules_fetch_endpoint_form_alter(&$form, &$form_state, $options
 function relation_rules_fetch_endpoint($relation, $entity_type, $number = 1) {
   // Make sure we have the fully loaded relation entity.
   $loaded_relation = relation_load($relation->rid);
-  // Load the endpoints
+  // Load the endpoints.
   $endpoints = field_get_items($loaded_relation, 'endpoints');
 
   $entity_ids = array();
@@ -428,7 +431,9 @@ function relation_rules_fetch_endpoint($relation, $entity_type, $number = 1) {
     // We only want to return entities of the selected type.
     if (!empty($endpoint['entity_type']) && $entity_type == $endpoint['entity_type']) {
       $entity_ids[] = $endpoint['entity_id'];
-      if ($number == count($entity_ids)) break;
+      if ($number == count($entity_ids)) {
+        break;
+      }
     }
   }
   if ($entity_ids) {

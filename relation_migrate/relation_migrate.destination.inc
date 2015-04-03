@@ -9,6 +9,9 @@
  * Destination class implementing migration into relation.
  */
 class MigrateDestinationRelation extends MigrateDestinationEntity {
+  /**
+   *
+   */
   static public function getKeySchema() {
     return array(
       'rid' => array(
@@ -21,19 +24,19 @@ class MigrateDestinationRelation extends MigrateDestinationEntity {
   }
 
   /**
-   * Basic initialization
+   * Basic initialization.
    *
    * @param string $bundle
-   *  A.k.a. the content type (page, article, etc.) of the node.
+   *   A.k.a. the content type (page, article, etc.) of the node.
    * @param array $options
-   *  Options applied to nodes.
+   *   Options applied to nodes.
    */
   public function __construct($bundle, array $options = array()) {
     parent::__construct('relation', $bundle, $options);
   }
 
   /**
-   * Returns a list of fields available to be mapped for the relation type (bundle)
+   * Returns a list of fields available to be mapped for the relation type (bundle).
    *
    * @return array
    *  Keys: machine names of the fields (to be passed to addFieldMapping)
@@ -41,14 +44,14 @@ class MigrateDestinationRelation extends MigrateDestinationEntity {
    */
   public function fields() {
     $fields = array();
-    // First the core (relation table) properties
+    // First the core (relation table) properties.
     $fields['rid'] = t('Relation: Existing relation ID');
     $fields['is_new'] = t('Relation: Indicates a new relation with the specified rid should be created');
     $fields['uid'] = t('Relation: Authored by (uid)');
     $fields['created'] = t('Relation: Created timestamp');
     $fields['changed'] = t('Relation: Modified timestamp');
 
-    // Then add in anything provided by handlers
+    // Then add in anything provided by handlers.
     $fields += migrate_handler_invoke_all('Entity', 'fields', $this->entityType, $this->bundle);
     $fields += migrate_handler_invoke_all('Relation', 'fields', $this->entityType, $this->bundle);
 
@@ -59,7 +62,7 @@ class MigrateDestinationRelation extends MigrateDestinationEntity {
    * Delete a batch of relations at once.
    *
    * @param $rids
-   *  Array of relation IDs to be deleted.
+   *   Array of relation IDs to be deleted.
    */
   public function bulkRollback(array $rids) {
     migrate_instrument_start('relation_delete_multiple');
@@ -73,9 +76,9 @@ class MigrateDestinationRelation extends MigrateDestinationEntity {
    * Import a single relation.
    *
    * @param $relation
-   *  Relation object to build. Prefilled with any fields mapped in the Migration.
+   *   Relation object to build. Prefilled with any fields mapped in the Migration.
    * @param $row
-   *  Raw source data object - passed through to prepare/complete handlers.
+   *   Raw source data object - passed through to prepare/complete handlers.
    *
    * @return array
    *  Array of key fields (rid only in this case) of the relation that was saved if
@@ -85,7 +88,7 @@ class MigrateDestinationRelation extends MigrateDestinationEntity {
     // Updating previously-migrated content?
     $migration = Migration::currentMigration();
     if (isset($row->migrate_map_destid1)) {
-      // Make sure is_new is off
+      // Make sure is_new is off.
       $relation->is_new = FALSE;
       if (isset($relation->rid)) {
         if ($relation->rid != $row->migrate_map_destid1) {
@@ -97,7 +100,7 @@ class MigrateDestinationRelation extends MigrateDestinationEntity {
       else {
         $relation->rid = $row->migrate_map_destid1;
       }
-      // Get the existing vid, so updates don't generate notices
+      // Get the existing vid, so updates don't generate notices.
       $values = db_select('relation', 'r')->fields('r', array('vid'))->condition('rid', $relation->rid)->execute()->fetchAssoc();
       $relation->vid = $values['vid'];
     }
@@ -136,14 +139,14 @@ class MigrateDestinationRelation extends MigrateDestinationEntity {
       }
     }
 
-    // Trying to update an existing relation
+    // Trying to update an existing relation.
     if ($migration->getSystemOfRecord() == Migration::DESTINATION) {
-      // Incoming data overrides existing data, so only copy non-existent fields
+      // Incoming data overrides existing data, so only copy non-existent fields.
       foreach ($old_node as $field => $value) {
         // An explicit NULL in the source data means to wipe to old value (i.e.,
         // don't copy it over from $old_node)
         if (property_exists($relation, $field) && $relation->$field === NULL) {
-          // Ignore this field
+          // Ignore this field.
         }
         elseif (!isset($relation->$field)) {
           $relation->$field = $old_relation->$field;
@@ -151,7 +154,7 @@ class MigrateDestinationRelation extends MigrateDestinationEntity {
       }
     }
 
-    // Invoke migration prepare handlers
+    // Invoke migration prepare handlers.
     $this->prepare($relation, $row);
 
     if (isset($relation->rid) && empty($relation->is_new)) {
@@ -161,7 +164,7 @@ class MigrateDestinationRelation extends MigrateDestinationEntity {
       $updating = FALSE;
     }
 
-    // Save relation object
+    // Save relation object.
     migrate_instrument_start('relation_save');
     $rid = relation_save($relation);
     migrate_instrument_stop('relation_save');
@@ -194,5 +197,5 @@ class MigrateDestinationRelation extends MigrateDestinationEntity {
     $this->complete($relation, $row);
     return $return;
   }
-}
 
+}

@@ -1,6 +1,7 @@
 <?php
 
 /**
+ * @file
  * @files
  * Hook implementations in behalf of core and supported contrib modules.
  */
@@ -84,4 +85,3 @@ function entityreference_relation_migrate_type_target_validate($element, $form_s
 
   return $return;
 }
-

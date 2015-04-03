@@ -28,7 +28,7 @@ class EntityCollectorController extends ControllerBase {
     foreach ($relation->endpoints[Language::LANGCODE_NOT_SPECIFIED] as $delta => $endpoint) {
       $entities = entity_load($endpoint['entity_type'], array($endpoint['entity_id']));
       $entity = $entities[$endpoint['entity_id']];
-      list( , , $entity_bundle) = entity_extract_ids($endpoint['entity_type'], $entity);
+      list(, , $entity_bundle) = entity_extract_ids($endpoint['entity_type'], $entity);
       $_SESSION['relation_entity_keys'][] = array(
         'entity_type' => $endpoint['entity_type'],
         'entity_id' => $endpoint['entity_id'],
@@ -41,4 +41,5 @@ class EntityCollectorController extends ControllerBase {
     drupal_set_message(t('The relation is ready for edit'));
     drupal_goto();
   }
+
 }

@@ -16,6 +16,9 @@ class RelationRulesTest extends RelationTestBase {
 
   public static $modules = array('relation', 'node', 'rules');
 
+  /**
+   * {@inheritdoc}
+   */
   public static function getInfo() {
     return array(
       'name' => 'Relation Rules integration test',
@@ -24,17 +27,20 @@ class RelationRulesTest extends RelationTestBase {
     );
   }
 
-  function setUp() {
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp() {
     parent::setUp();
     // While setUp fails for non-existing modules, module_enable() doesn't.
     module_enable(array('rules'));
 
     // Defines users and permissions.
     $permissions = array(
-      // Node
+      // Node:
       'create article content',
       'create page content',
-      // Relation
+      // Relation:
       'administer relation types',
       'administer relations',
       'access relations',
@@ -48,8 +54,10 @@ class RelationRulesTest extends RelationTestBase {
 
   /**
    * Test to create a relation in different ways by executing a rule.
+   *
+   * @TODO
    */
-  function todo_testRelationCreateRelation() {
+  public function todoTestRelationCreateRelation() {
     // We don't want test failures if the Rules module isn't used.
     if (module_exists('rules')) {
       $node = $this->drupalCreateNode(array('type' => 'article'));
@@ -89,7 +97,8 @@ class RelationRulesTest extends RelationTestBase {
         'type' => 'relation',
         'param_relation_type' => $this->relation_types['symmetric']['relation_type'],
         'param_author:select' => 'site:current-user',
-        // Now, load the endpoints from the fetched relation, into a new relation.
+        // Now, load the endpoints from the fetched relation, into a new
+        // relation.
         'param_endpoints:select' => 'entity-fetched:endpoints',
         'entity_created:var' => 'relation',
       ));
@@ -99,16 +108,14 @@ class RelationRulesTest extends RelationTestBase {
       // last inserted id, which should be the relation we are looking for.
       $rid = db_query('SELECT MAX(rid) FROM {relation}')->fetchField();
       $relation = relation_load($rid);
-      // The $node and the $user should be the the same as in the last test, since
-      // we fetched the endpoits from that relation.
+      // The $node and the $user should be the the same as in the last test,
+      // since we fetched the endpoits from that relation.
       $correct = ($relation->endpoints[Language::LANGCODE_NOT_SPECIFIED][0]['entity_id'] == $node->nid) && ($relation->endpoints[Language::LANGCODE_NOT_SPECIFIED][1]['entity_id'] == $user->uid);
       $this->assertTrue($correct, 'Relation was created by fetching endpoints from another relation and saving it.');
 
-
       // Tests that relation properties are available in rules. So create a new
-      // rule with relation action, and check that the text is available among the
-      // "Data selectors" list.
-
+      // rule with relation action, and check that the text is available among
+      // the "Data selectors" list.
       // Enables UI module for rules.
       module_enable(array('rules_admin'));
       // Resets permissions, because module_enable() doesn't clear static cache.
@@ -135,11 +142,14 @@ class RelationRulesTest extends RelationTestBase {
         'element_name' => 'relation_rules_load_related',
       );
       $this->drupalPostForm(NULL, $post, t('Continue'));
-      $this->assertText('node:relation-directional-node-reverse:0', t('The created relation porperties\' are found.'));
+      $this->assertText('node:relation-directional-node-reverse:0', "The created relation properties are found.");
     }
   }
 
-  function todo_testRelationLoadRelatedRules() {
+  /**
+   * TODO.
+   */
+  public function todoTestRelationLoadRelatedRules() {
     if (module_exists('rules')) {
       $nid = $this->node1->nid;
       variable_set('relation_rules_test_nid', $nid);
@@ -159,4 +169,5 @@ class RelationRulesTest extends RelationTestBase {
       $this->assertEqual($count, db_query('SELECT COUNT(*) FROM {node} WHERE nid IN (:nids)', array(':nids' => $nids))->fetchField(), t('@count other nodes were found', array('@count' => $count)));
     }
   }
+
 }

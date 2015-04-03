@@ -7,8 +7,13 @@
 namespace Drupal\relation_endpoint\Type;
 
 use Drupal\Core\Field\FieldItemList;
-
+/**
+ *
+ */
 class RelationField extends FieldItemList {
+  /**
+   *
+   */
   public function preSave() {
     // We need r_index here because EntityFieldQuery can't query on deltas.
     if (isset($this->list)) {
@@ -17,4 +22,5 @@ class RelationField extends FieldItemList {
       }
     }
   }
+
 }

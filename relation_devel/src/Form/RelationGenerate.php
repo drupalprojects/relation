@@ -79,4 +79,5 @@ class RelationGenerate extends FormBase {
     $relation_types = empty($relation_types) ? NULL : $relation_types;
     $rids = relation_generate_relations($number, $relation_types, $kill);
   }
+
 }

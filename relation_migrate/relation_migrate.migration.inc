@@ -6,7 +6,9 @@
  */
 
 use Drupal\Core\Language\Language;
-
+/**
+ *
+ */
 abstract class RelationMigrateReference extends Migration {
 
   /**
@@ -56,39 +58,66 @@ abstract class RelationMigrateReference extends Migration {
     $this->addFieldMapping('uid')->defaultValue(variable_get('relation_migrate_' . $field_type . '_user', 1))->description(t('The owner of relation.'));
   }
 
+  /**
+   *
+   */
   public function prepare(stdClass $relation, stdClass $source_row) {
     $relation->endpoints[Language::LANGCODE_NOT_SPECIFIED] = array(
       array('entity_type' => $source_row->source_type, 'entity_id' => $source_row->source_id),
       array('entity_type' => $source_row->destination_type, 'entity_id' => $source_row->destination_id),
     );
   }
-}
 
+}
+/**
+ *
+ */
 class RelationMigrateEntityReference extends RelationMigrateReference {
+  /**
+   *
+   */
   public function __construct() {
     parent::__construct('entityreference');
     $this->source = new MigrateSourceEntityReference($this->fields);
   }
-}
 
+}
+/**
+ *
+ */
 class RelationMigrateNodeReference extends RelationMigrateReference {
+  /**
+   *
+   */
   public function __construct() {
     parent::__construct('node_reference');
     $this->source = new MigrateSourceNodeReference($this->fields);
   }
-}
 
+}
+/**
+ *
+ */
 class RelationMigrateUserReference extends RelationMigrateReference {
+  /**
+   *
+   */
   public function __construct() {
     parent::__construct('user_reference');
     $this->source = new MigrateSourceUserReference($this->fields);
   }
-}
 
+}
+/**
+ *
+ */
 class RelationMigrateTermReference extends RelationMigrateReference {
+  /**
+   *
+   */
   public function __construct() {
     parent::__construct('taxonomy_term_reference');
     $this->source = new MigrateSourceTermReference($this->fields);
   }
-}
 
+}

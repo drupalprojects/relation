@@ -28,4 +28,5 @@ class views_handler_field_relation_link_edit extends views_handler_field_relatio
     $text = !empty($this->options['text']) ? $this->options['text'] : t('Edit');
     return $text;
   }
+
 }

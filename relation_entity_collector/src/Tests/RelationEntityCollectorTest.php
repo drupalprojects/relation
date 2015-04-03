@@ -15,6 +15,9 @@ use Drupal\relation\Tests\RelationTestBase;
 class RelationEntityCollectorTest extends RelationTestBase {
   public static $modules = array('relation_entity_collector');
 
+  /**
+   *
+   */
   public static function getInfo() {
     return array(
       'name' => 'Relation Entity Collector test',
@@ -23,15 +26,18 @@ class RelationEntityCollectorTest extends RelationTestBase {
     );
   }
 
+  /**
+   *
+   */
   function setUp() {
     parent::setUp();
 
     // Defines users and permissions.
     $permissions = array(
-      // Node
+      // Node.
       'create article content',
       'create page content',
-      // Relation
+      // Relation.
       'administer relation types',
       'administer relations',
       'access relations',
@@ -90,4 +96,5 @@ class RelationEntityCollectorTest extends RelationTestBase {
     $this->assertRaw(l($this->node1->label(), $node1_uri['path'], $node1_uri['options']), 'Node1 link found');
     $this->assertRaw(l($this->node3->label(), $node3_uri['path'], $node3_uri['options']), 'Node1 link found');
   }
+
 }

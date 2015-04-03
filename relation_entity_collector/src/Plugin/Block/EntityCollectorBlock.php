@@ -34,4 +34,5 @@ class EntityCollectorBlock extends BlockBase {
   public function build() {
     return \Drupal::formBuilder()->getForm('Drupal\relation_entity_collector\Form\EntityCollector');
   }
+
 }

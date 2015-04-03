@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\relation_endpoint\Plugin\Field\FieldFormatter\RelationEndpointFormatter
+ * Contains \Drupal\relation_endpoint\Plugin\Field\FieldFormatter\RelationEndpointFormatter.
  */
 
 namespace Drupal\relation_endpoint\Plugin\Field\FieldFormatter;
@@ -46,14 +46,15 @@ class RelationEndpointFormatter extends FormatterBase {
         if ($entity = entity_load($item->entity_type, $item->entity_id)) {
           $label = $entity->label();
           $label_cell['data'] = array(
-              '#type' => 'link',
-              '#title' => (!empty($label) && strlen($label) > 0) ? $label : t('Untitled', $t),
-            ) + $entity->urlInfo()->toRenderArray();
+            '#type' => 'link',
+            '#title' => (!empty($label) && strlen($label) > 0) ? $label : t('Untitled', $t),
+          ) + $entity->urlInfo()->toRenderArray();
         }
         else {
           $label_cell = t('Deleted');
         }
-      } catch (PluginNotFoundException $e) {
+      }
+      catch (PluginNotFoundException $e) {
         $label_cell = t($e->getMessage());
       }
 
@@ -66,4 +67,5 @@ class RelationEndpointFormatter extends FormatterBase {
       '#rows' => $rows,
     );
   }
+
 }

@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\relation_endpoint\Plugin\Field\FieldWidget\RelationEndpointWidget
+ * Contains \Drupal\relation_endpoint\Plugin\Field\FieldWidget\RelationEndpointWidget.
  *
  * TODO: Figure out if there is easier way to say "no we don't have edit widget"
  */
@@ -32,4 +32,5 @@ class RelationEndpointWidget extends WidgetBase {
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     return array();
   }
+
 }

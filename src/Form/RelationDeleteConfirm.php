@@ -58,4 +58,5 @@ class RelationDeleteConfirm extends ContentEntityConfirmFormBase {
     drupal_set_message(t('Relation @id has been deleted.', array('@id' => $this->entity->id())));
     $form_state->set('redirect', '<front>');
   }
+
 }

@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\relation_endpoint\Plugin\Field\FieldType\RelationEndpointItem
+ * Contains \Drupal\relation_endpoint\Plugin\Field\FieldType\RelationEndpointItem.
  */
 
 namespace Drupal\relation_endpoint\Plugin\Field\FieldType;
@@ -84,4 +84,5 @@ class RelationEndpointItem extends FieldItemBase {
     $value = $this->get('entity_id')->getValue();
     return $value === NULL || $value === '';
   }
+
 }

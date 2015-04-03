@@ -90,7 +90,8 @@ function relation_generate_relations($number_relations = 10, $relation_types = a
     }
     $arity = rand($relation_type->min_arity, $relation_type->min_arity);
 
-    for ($i = $number_relations; $i > 0; $i--) { // start new relation
+    for ($i = $number_relations; $i > 0; $i--) {
+      // Start new relation.
       $endpoints = array();
       for ($r_index = 0; $r_index < $arity; $r_index++) {
         $direction = ($relation_type->directional && $r_index > 0) ? 'target' : 'source';

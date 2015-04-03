@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\relation_endpoint\Plugin\Field\FieldFormatter\RelationEndpointFullFormatter
+ * Contains \Drupal\relation_endpoint\Plugin\Field\FieldFormatter\RelationEndpointFullFormatter.
  */
 
 namespace Drupal\relation_endpoint\Plugin\Field\FieldFormatter;
@@ -40,4 +40,5 @@ class RelationEndpointFullFormatter extends FormatterBase {
 
     return $build;
   }
+
 }

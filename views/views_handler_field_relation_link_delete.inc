@@ -28,4 +28,5 @@ class views_handler_field_relation_link_delete extends views_handler_field_relat
     $text = !empty($this->options['text']) ? $this->options['text'] : t('Delete');
     return $text;
   }
+
 }
