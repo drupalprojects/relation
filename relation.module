@@ -274,19 +274,23 @@ function relation_query($entity_type = NULL, $entity_id = NULL, $r_index = NULL)
  * @param string $entity_type
  *   Entity type of the related entity.
  * @param int $entity_id
- *   Entity id of the related entity. Can be an array of entity IDs.
+ *   (optional) Entity id of the related entity. Can be an array of entity IDs.
  * @param int|null $r_index
- *   The index of the related entity within the requested relation(s).
+ *   (optional) The index of the related entity within the requested
+ *   relation(s).
  *
  * @todo rename. / extend class ala RelationQuery::related()
  *
  * @return Drupal\Core\Entity\Query\QueryInterface
  *   The query object
  */
-function relation_query_add_related(QueryInterface $query, $entity_type, $entity_id, $r_index = NULL) {
+function relation_query_add_related(QueryInterface $query, $entity_type, $entity_id = NULL, $r_index = NULL) {
   $group = $query->andConditionGroup()
-    ->condition('endpoints.entity_type', $entity_type, '=')
-    ->condition('endpoints.entity_id', $entity_id, NULL);
+    ->condition('endpoints.entity_type', $entity_type, '=');
+
+  if (isset($entity_id)) {
+    $group->condition('endpoints.entity_id', $entity_id, NULL);
+  }
 
   if (isset($r_index)) {
     $group->condition('endpoints.r_index', $r_index, '=');
