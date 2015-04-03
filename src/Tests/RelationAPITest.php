@@ -19,6 +19,9 @@ class RelationAPITest extends RelationTestBase {
 
   public static $modules = array('node');
 
+  /**
+   * {@inheritdoc}
+   */
   public static function getInfo() {
     return array(
       'name' => 'Relation API',
@@ -27,17 +30,20 @@ class RelationAPITest extends RelationTestBase {
     );
   }
 
-  function setUp() {
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp() {
     // This is necessary for the ->sort('created', 'DESC') test.
     $this->sleep = TRUE;
     parent::setUp();
 
     // Defines users and permissions.
     $permissions = array(
-      // Node
+      // Node.
       'create article content',
       'create page content',
-      // Relation
+      // Relation.
       'administer relation types',
       'administer relations',
       'access relations',
@@ -49,15 +55,17 @@ class RelationAPITest extends RelationTestBase {
     $this->drupalLogin($this->web_user);
   }
 
-  function testRelationHelpers() {
+  /**
+   * Test relation helper functions.
+   */
+  public function testRelationHelpers() {
     // ## Test relation_relation_exists()
-
     // Where relation type is set.
     $exists = relation_relation_exists($this->endpoints, $this->relation_type_symmetric);
     $this->verbose(print_r($exists, TRUE));
     $this->assertTrue(isset($exists[$this->rid_symmetric]), 'Relation exists.');
 
-    // Where relation type is not set
+    // Where relation type is not set.
     $exists = relation_relation_exists($this->endpoints_4);
     $this->assertTrue(isset($exists[$this->rid_octopus]), 'Relation exists.');
 
@@ -66,21 +74,22 @@ class RelationAPITest extends RelationTestBase {
     $endpoints_do_not_exist[1]['entity_type'] = $this->randomMachineName();
     $this->assertEqual(array(), relation_relation_exists($endpoints_do_not_exist, $this->relation_type_symmetric), 'Relation with non-existant endpoint not found.');
 
-    // Where there are too many endpoints
+    // Where there are too many endpoints.
     $endpoints_excessive = $this->endpoints;
     $endpoints_excessive[] = array('entity_type' => $this->randomMachineName(), 'entity_id' => 1000);
     $this->assertEqual(array(), relation_relation_exists($endpoints_do_not_exist, $this->relation_type_symmetric), 'Relation with too many endpoints not found.');
 
-    // Where relation type is invalid
+    // Where relation type is invalid.
     $this->assertEqual(array(), relation_relation_exists($this->endpoints, $this->randomMachineName()), 'Relation with invalid relation type not found.');
 
   }
 
   /**
    * Tests all available methods in RelationQuery.
+   *
    * Creates some nodes, add some relations and checks if they are related.
    */
-  function testRelationQuery() {
+  public function testRelationQuery() {
     $relations = entity_load_multiple('relation', array_keys(relation_query('node', $this->node1->id())->execute()));
 
     // Check that symmetric relation is correctly related to node 4.
@@ -131,7 +140,7 @@ class RelationAPITest extends RelationTestBase {
       ->execute();
     $count = count($relations);
     $this->assertEqual($count, 1);
-    // Check that we have the correct relations
+    // Check that we have the correct relations.
     $this->assertEqual(isset($relations[$this->rid_octopus]), 'Got one correct relation.');
 
     // Get relations for node 1 (symmetric, directional, octopus), limit to
@@ -163,7 +172,11 @@ class RelationAPITest extends RelationTestBase {
     $relations = relation_query('node', $this->node1->id())
       ->sort('created', 'DESC')
       ->execute();
-    $this->assertEqual($relations, array($this->rid_octopus => $this->rid_octopus, $this->rid_directional => $this->rid_directional, $this->rid_symmetric => $this->rid_symmetric));
+    $this->assertEqual($relations, array(
+      $this->rid_octopus => $this->rid_octopus,
+      $this->rid_directional => $this->rid_directional,
+      $this->rid_symmetric => $this->rid_symmetric,
+    ));
 
     // Create 10 more symmetric relations and verify that the count works with
     // double digit counts as well.
@@ -179,7 +192,7 @@ class RelationAPITest extends RelationTestBase {
   /**
    * Tests relation types.
    */
-  function testRelationTypes() {
+  public function testRelationTypes() {
     // Symmetric.
     $related = relation_get_related_entity('node', $this->node1->id());
     $this->assertEqual($this->node4->id(), $related->id());
@@ -208,7 +221,7 @@ class RelationAPITest extends RelationTestBase {
   /**
    * Tests saving of relations.
    */
-  function testRelationSave() {
+  public function testRelationSave() {
     foreach ($this->relation_types as $value) {
       $relation_type = $value['relation_type'];
       $endpoints = $this->endpoints;
@@ -246,7 +259,7 @@ class RelationAPITest extends RelationTestBase {
   /**
    * Tests relation delete.
    */
-  function testRelationDelete() {
+  public function testRelationDelete() {
     // Invalid relations are deleted when any endpoint entity is deleted.
     // Octopus relation is valid with 3 endpoints, currently it has 4.
     $this->node1->delete();
@@ -257,8 +270,10 @@ class RelationAPITest extends RelationTestBase {
 
   /**
    * Tests relation revisions.
-   *//*
-  function testRelationRevision() {
+   *
+   * @TODO
+   */
+  public function todoTestRelationRevision() {
     $first_user = $this->drupalCreateUser(array('edit relations'));
     $second_user = $this->drupalCreateUser(array('edit relations'));
 
@@ -269,7 +284,7 @@ class RelationAPITest extends RelationTestBase {
     $this->assertEqual($relation->id(), $first_user->id(), 'Relation uid set to logged in user.');
     $vid = $relation->getRevisionId();
 
-    // Relation should still be owned by the first user
+    // Relation should still be owned by the first user.
     $this->drupalLogin($second_user);
     $relation = entity_load('relation', $rid);
     $relation->save();
@@ -280,5 +295,5 @@ class RelationAPITest extends RelationTestBase {
     $second_revision = entity_revision_load('relation', $relation->vid);
     $this->assertNotIdentical($first_revision->revision_uid, $second_revision->revision_uid, 'Each revision has a distinct user.');
   }
-*/
+
 }

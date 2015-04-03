@@ -13,14 +13,24 @@ use Drupal\simpletest\WebTestBase;
  * Provides common helper methods for Taxonomy module tests.
  */
 abstract class RelationTestBase extends WebTestBase {
-  public static $modules = array('relation'
-  // Loading all dependencies since d.o testbot is fussy.
-    ,'dynamic_entity_reference', 'field', 'field_ui', 'block'
+
+  /**
+   * Load all dependencies since d.o testbot is fussy.
+   */
+  public static $modules = array(
+    'relation',
+    'relation_endpoint',
+    'field',
+    'field_ui',
+    'block',
   );
 
   protected $sleep = FALSE;
 
-  function setUp() {
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp() {
     parent::setUp();
     // Create Basic page and Article node types.
     if ($this->profile != 'standard') {
@@ -48,23 +58,48 @@ abstract class RelationTestBase extends WebTestBase {
   /**
    * Creates nodes.
    */
-  function createRelationNodes() {
-    $this->node1 = $this->drupalCreateNode(array('type' => 'article', 'promote' => 1, 'title' => 'Grandparent'));
-    $this->node2 = $this->drupalCreateNode(array('type' => 'article', 'promote' => 0));
-    $this->node3 = $this->drupalCreateNode(array('type' => 'page', 'promote' => 1, 'title' => 'Parent'));
-    $this->node4 = $this->drupalCreateNode(array('type' => 'page', 'promote' => 0, 'title' => 'Child'));
-    $this->node5 = $this->drupalCreateNode(array('type' => 'page', 'promote' => 0));
-    $this->node6 = $this->drupalCreateNode(array('type' => 'page', 'promote' => 0, 'title' => 'Unrelated'));
+  protected function createRelationNodes() {
+    $this->node1 = $this->drupalCreateNode(array(
+      'type' => 'article',
+      'promote' => 1,
+      'title' => 'Grandparent',
+    ));
+    $this->node2 = $this->drupalCreateNode(array(
+      'type' => 'article',
+      'promote' => 0,
+    ));
+    $this->node3 = $this->drupalCreateNode(array(
+      'type' => 'page',
+      'promote' => 1,
+      'title' => 'Parent',
+    ));
+    $this->node4 = $this->drupalCreateNode(array(
+      'type' => 'page',
+      'promote' => 0,
+      'title' => 'Child',
+    ));
+    $this->node5 = $this->drupalCreateNode(array(
+      'type' => 'page',
+      'promote' => 0,
+    ));
+    $this->node6 = $this->drupalCreateNode(array(
+      'type' => 'page',
+      'promote' => 0,
+      'title' => 'Unrelated',
+    ));
   }
 
-  function createRelationUsers() {
+  /**
+   * Create users for relation tests.
+   */
+  protected function createRelationUsers() {
     $this->user1 = $this->drupalCreateUser();
   }
 
   /**
    * Creates end points.
    */
-  function createRelationEndPoints() {
+  protected function createRelationEndPoints() {
     $this->endpoints = array(
       array('entity_type' => 'node', 'entity_id' => $this->node1->id()),
       array('entity_type' => 'node', 'entity_id' => $this->node4->id()),
@@ -91,11 +126,16 @@ abstract class RelationTestBase extends WebTestBase {
   /**
    * Creates a set of standard relation types.
    */
-  function createRelationTypes() {
+  protected function createRelationTypes() {
     $this->relation_types['symmetric'] = array(
       'relation_type' => 'symmetric',
       'label' => 'symmetric',
-      'source_bundles' => array('node:article', 'node:page', 'taxonomy_term:*', 'user:*'),
+      'source_bundles' => array(
+        'node:article',
+        'node:page',
+        'taxonomy_term:*',
+        'user:*',
+      ),
     );
     $this->relation_types['directional'] = array(
       'relation_type' => 'directional',
@@ -141,7 +181,7 @@ abstract class RelationTestBase extends WebTestBase {
   /**
    * Creates a Symmetric relation.
    */
-  function createRelationSymmetric() {
+  protected function createRelationSymmetric() {
     // Article 1 <--> Page 4
     $this->relation_type_symmetric = $this->relation_types['symmetric']['relation_type'];
     $this->rid_symmetric = $this->saveRelation($this->relation_type_symmetric, $this->endpoints);
@@ -150,7 +190,7 @@ abstract class RelationTestBase extends WebTestBase {
   /**
    * Creates a Directional relation.
    */
-  function createRelationDirectional() {
+  protected function createRelationDirectional() {
     // Article 1 --> Page 3
     $this->endpoints_directional = $this->endpoints;
     $this->endpoints_directional[1]['entity_id'] = $this->node3->id();
@@ -188,7 +228,7 @@ abstract class RelationTestBase extends WebTestBase {
   /**
    * Creates an Octopus (4-ary) relation.
    */
-  function createRelationOctopus() {
+  protected function createRelationOctopus() {
     // Nodes 1, 2, 3, 4 are related.
     $this->relation_type_octopus = $this->relation_types['octopus']['relation_type'];
     $this->rid_octopus = $this->saveRelation($this->relation_type_octopus, $this->endpoints_4);
@@ -197,7 +237,7 @@ abstract class RelationTestBase extends WebTestBase {
   /**
    * Creates an Unary relation.
    */
-  function createRelationUnary() {
+  protected function createRelationUnary() {
     // Page 5 <--> Page 5
     $this->relation_type_unary = $this->relation_types['unary']['relation_type'];
     $this->rid_unary = $this->saveRelation($this->relation_type_unary, $this->endpoints_unary);
@@ -205,12 +245,18 @@ abstract class RelationTestBase extends WebTestBase {
 
   /**
    * Saves a relation.
+   *
+   * @param string $relation_type
+   *   Machine name of the relation type.
+   * @param array $endpoints
+   *   An array containing the endpoints.
    */
-  function saveRelation($relation_type, $endpoints) {
+  protected function saveRelation($relation_type, array $endpoints) {
     $relation = relation_insert($relation_type, $endpoints);
     if ($this->sleep) {
       sleep(1);
     }
     return $relation->id();
   }
+
 }

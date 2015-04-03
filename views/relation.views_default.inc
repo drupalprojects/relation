@@ -11,7 +11,7 @@
 function relation_views_default_views() {
   $views = array();
 
-  $view = new view;
+  $view = new view();
   $view->name = 'relations';
   $view->description = 'Lists relations of a certain type';
   $view->tag = 'default';

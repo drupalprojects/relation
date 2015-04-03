@@ -45,4 +45,5 @@ class RelationForm extends ContentEntityForm {
 
     return parent::form($form, $form_state, $relation);
   }
+
 }

@@ -41,7 +41,8 @@ class RelationTypeForm extends EntityForm {
       ),
       '#suffix' => '<div class="clearfix"></div>',
     );
-    $form['labels']['name'] = array( // use 'name' for /misc/machine-name.js
+    $form['labels']['name'] = array(
+    // Use 'name' for /misc/machine-name.js
       '#type' => 'textfield',
       '#title' => t('Label'),
       '#description' => t('Display name of the relation type. This is also used as the predicate in natural language formatters (ie. if A is related to B, you get "A [label] B")'),
@@ -112,7 +113,7 @@ class RelationTypeForm extends EntityForm {
       '#description'    => t('Whether relations of this type are unique (ie. they can not contain exactly the same end points as other relations of this type).'),
       '#default_value'  => $relation_type->r_unique,
     );
-    // these should probably be changed to numerical (validated) textfields.
+    // These should probably be changed to numerical (validated) textfields.
     $options = array('1' => '1', '2' => '2', '3' => '3', '4' => '4', '5' => '5', '6' => '6', '7' => '7', '8' => '8');
     $form['advanced']['min_arity'] = array(
       '#type' => 'select',
@@ -188,7 +189,7 @@ class RelationTypeForm extends EntityForm {
     $min_arity = $form_state->getValue('min_arity');
     $max_arity = $form_state->getValue('max_arity');
 
-    // Empty max arity indicates infinite arity
+    // Empty max arity indicates infinite arity.
     if ($max_arity && $min_arity > $max_arity) {
       $form_state->setErrorByName('min_arity', t('Minimum arity cannot be more than maximum arity.'));
     }
@@ -201,13 +202,16 @@ class RelationTypeForm extends EntityForm {
     $relation_type = $this->entity;
     $relation_type->label = $form_state->getValue('name');
 
-    $save_message = $relation_type->isNew() ? 'The %relation_type relation type has been created.' : 'The %relation_type relation type has been saved.';
+    $save_message = $relation_type->isNew() ?
+      t('The %relation_type relation type has been created.', array('%relation_type' => $relation_type->relation_type)) :
+      t('The %relation_type relation type has been saved.', array('%relation_type' => $relation_type->relation_type));
     if ($relation_type->save()) {
-      drupal_set_message(t($save_message, array('%relation_type' => $relation_type->relation_type)));
+      drupal_set_message($save_message);
       $form_state->setRedirectUrl($relation_type->urlInfo());
     }
     else {
       drupal_set_message(t('Error saving relation type.', 'error'));
     }
   }
+
 }

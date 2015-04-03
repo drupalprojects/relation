@@ -12,12 +12,18 @@
  */
 class views_handler_field_relation_link extends views_handler_field_entity {
 
+  /**
+   *
+   */
   function option_definition() {
     $options = parent::option_definition();
     $options['text'] = array('default' => '', 'translatable' => TRUE);
     return $options;
   }
 
+  /**
+   *
+   */
   function options_form(&$form, &$form_state) {
     $form['text'] = array(
       '#type' => 'textfield',
@@ -31,12 +37,18 @@ class views_handler_field_relation_link extends views_handler_field_entity {
     $form['alter']['external'] = array('#access' => FALSE);
   }
 
+  /**
+   *
+   */
   function render($values) {
     if ($entity = $this->get_value($values)) {
       return $this->render_link($entity, $values);
     }
   }
 
+  /**
+   *
+   */
   function render_link($relation, $values) {
     if (!$relation->access('view')) {
       $this->options['alter']['make_link'] = TRUE;
@@ -45,4 +57,5 @@ class views_handler_field_relation_link extends views_handler_field_entity {
       return $text;
     }
   }
+
 }

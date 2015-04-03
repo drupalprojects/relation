@@ -18,10 +18,11 @@ use Drupal\field\Entity\FieldStorageConfig;
  * @ViewsRelationship("relation_relationship")
  */
 class RelationRelationship extends RelationshipStandard {
+
   /**
    * Define delta option.
    */
-  function defineOptions() {
+  public function defineOptions() {
     $options = parent::defineOptions();
     $options['delta'] = array('default' => -1);
     $options['entity_deduplication_left'] = array('default' => FALSE);
@@ -32,10 +33,11 @@ class RelationRelationship extends RelationshipStandard {
   /**
    * Let the user choose delta.
    */
-  function buildOptionsForm(&$form, FormStateInterface $form_state) {
+  public function buildOptionsForm(&$form, FormStateInterface $form_state) {
     parent::buildOptionsForm($form, $form_state);
 
-    // Check if this relation is entity-to-entity or entity-to-relation / relation-to-entity.
+    // Check if this relation is entity-to-entity or entity-to-relation /
+    // relation-to-entity.
     $endpoints_twice = isset($this->definition['entity_type_left']) && isset($this->definition['entity_type_right']);
 
     if ($this->definition['directional']) {
@@ -57,8 +59,8 @@ class RelationRelationship extends RelationshipStandard {
         $form['entity_deduplication_' . $key] = array(
           '#type' => 'checkbox',
           '#title' => $endpoints_twice ?
-            t('Avoid @direction @type duplication', array('@direction' => t($key), '@type' => $this->definition['entity_type_' . $key])) :
-            t('Avoid @type duplication', array('@type' => $this->definition['entity_type_' . $key])),
+          t('Avoid @direction @type duplication', array('@direction' => t($key), '@type' => $this->definition['entity_type_' . $key])) :
+          t('Avoid @type duplication', array('@type' => $this->definition['entity_type_' . $key])),
           '#default_value' => $this->options['entity_deduplication_' . $key],
           '#description' => t('When creating a chain of Views relationships for example from node to relation and then from relation to node (both via the same relation type) then each node will display on both ends. Check this option to avoid this kind of duplication.'),
         );
@@ -66,7 +68,10 @@ class RelationRelationship extends RelationshipStandard {
     }
   }
 
-  function query() {
+  /**
+   *
+   */
+  public function query() {
     $table_mapping = \Drupal::entityManager()->getStorage('relation')->getTableMapping();
     $endpoints_field = FieldStorageConfig::loadByName('relation', 'endpoints');
 
@@ -81,7 +86,8 @@ class RelationRelationship extends RelationshipStandard {
 
     $this->ensureMyTable();
 
-    // Join the left table with the entity type to the endpoints field data table.
+    // Join the left table with the entity type to the endpoints field data
+    // table.
     $configuration = array(
       'left_table' => $this->tableAlias,
       'left_field' => $this->realField,
@@ -98,7 +104,7 @@ class RelationRelationship extends RelationshipStandard {
     if (isset($this->definition['entity_type_left'])) {
       // The left table is an entity, not a relation.
       $configuration['field'] = $entity_id_field_name;
-      $this->ensure_no_duplicate_entities($configuration['extra'], $this->options['entity_deduplication_left'], $this->definition['relation_type'], $this->definition['entity_type_left'], $this->tableAlias, $this->realField);
+      $this->ensureNoDuplicateEntities($configuration['extra'], $this->options['entity_deduplication_left'], $this->definition['relation_type'], $this->definition['entity_type_left'], $this->tableAlias, $this->realField);
       $configuration['extra'][] = array(
         'field' => $entity_type_field_name,
         'value' => $this->definition['entity_type_left'],
@@ -162,7 +168,7 @@ class RelationRelationship extends RelationshipStandard {
     if (isset($this->definition['entity_type_right'])) {
       // We are finishing on an entity table.
       $configuration['left_field'] = $entity_id_field_name;
-      $this->ensure_no_duplicate_entities($configuration['extra'], $this->options['entity_deduplication_right'], $this->definition['relation_type'], $this->definition['entity_type_right'], $r, $entity_id_field_name);
+      $this->ensureNoDuplicateEntities($configuration['extra'], $this->options['entity_deduplication_right'], $this->definition['relation_type'], $this->definition['entity_type_right'], $r, $entity_id_field_name);
       $configuration['extra'][] = array(
         'table' => $r,
         'field' => $entity_type_field_name,
@@ -176,12 +182,15 @@ class RelationRelationship extends RelationshipStandard {
 
     $join = Views::pluginManager('join')->createInstance('standard', $configuration);
     $join->adjusted = TRUE;
-    // use a short alias for this:
+    // Use a short alias for this:
     $alias = $this->definition['base'] . '_' . $this->table;
     $this->alias = $this->query->addRelationship($alias, $join, $this->definition['base'], $this->relationship);
   }
 
-  protected function ensure_no_duplicate_entities(&$extra, $check, $relation_type, $entity_type, $table, $field) {
+  /**
+   *
+   */
+  protected function ensureNoDuplicateEntities(&$extra, $check, $relation_type, $entity_type, $table, $field) {
     if ($check && isset($this->view->relation_entity_tables[$entity_type][$relation_type])) {
       foreach ($this->view->relation_entity_tables[$entity_type][$relation_type] as $expression) {
         $extra[] = array(

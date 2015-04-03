@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * @file
+ */
+
 use Drupal\Component\Utility\String;
 
 /**
@@ -14,7 +18,7 @@ function relation_views_data() {
   // Define the base group of this table.
   $data['relation']['table']['group']  = t('Relation');
 
-  // Advertise this table as a possible base table
+  // Advertise this table as a possible base table.
   $data['relation']['table']['base'] = array(
     'field' => 'rid',
     'title' => t('Relation'),
@@ -59,7 +63,6 @@ function relation_views_data() {
       'id' => 'sort',
     ),
   );
-
 
   $data['relation']['vid'] = array(
     'title' => t('Vid'),
@@ -221,7 +224,7 @@ function relation_views_data_alter(&$data) {
       list($source_entity_type) = explode(':', $source_bundle, 2);
       $source_table = $entity_info[$source_entity_type]->getBaseTable();
 
-      // Translatable
+      // Translatable.
       $placeholders = array(
         '@left' => $source_entity_type,
         '@relation_type_label' => $relation_type->label,
@@ -252,7 +255,7 @@ function relation_views_data_alter(&$data) {
         $target_table = $entity_info[$target_entity_type]->getBaseTable();
 
         $placeholders['@right'] = $target_entity_type;
-        // Provide forward relationships
+        // Provide forward relationships.
         if ($source_table && $target_table) {
           $data[$source_table]['relation_' . $type . '_' . $target_entity_type] = array(
             'title' => t('Relation: @relation_type_label (@left @arrow @right)', $placeholders),
@@ -290,7 +293,7 @@ function relation_views_data_alter(&$data) {
           );
         }
 
-        // Provide reverse relationships
+        // Provide reverse relationships.
         if ($target_entity_type != $source_entity_type) {
           if ($source_table && $target_table) {
             $data[$target_table]['relation_' . $type . '_' . $source_entity_type] = array(

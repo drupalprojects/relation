@@ -24,4 +24,5 @@ interface RelationTypeInterface extends ConfigEntityInterface {
    *   An array containing bundles as key/value pairs, keyed by entity type.
    */
   public function getBundles($direction = NULL);
+
 }

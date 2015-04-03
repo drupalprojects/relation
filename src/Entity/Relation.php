@@ -15,7 +15,7 @@ use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Field\BaseFieldDefinition;
 
 /**
- * Defines relation entity
+ * Defines relation entity.
  *
  * @ContentEntityType(
  *   id = "relation",
@@ -166,7 +166,8 @@ class Relation extends ContentEntityBase implements RelationInterface {
    * {@inheritdoc}
    */
   public function uuid() {
-    // We don't have uuid (yet at least)
+    // We don't have uuid (yet at least).
     return NULL;
   }
+
 }

@@ -14,6 +14,9 @@ class RelationViewsTest extends RelationTestBase {
 
   public static $modules = array('node', 'views');
 
+  /**
+   * {@inheritdoc}
+   */
   public static function getInfo() {
     return array(
       'name' => 'Relation Views test',
@@ -22,17 +25,20 @@ class RelationViewsTest extends RelationTestBase {
     );
   }
 
-  function setUp() {
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp() {
     parent::setUp();
     // While setUp fails for non-existing modules, module_enable() doesn't.
     module_enable(array('views'));
 
     // Defines users and permissions.
     $permissions = array(
-      // Node
+      // Node.
       'create article content',
       'create page content',
-      // Relation
+      // Relation.
       'administer relation types',
       'administer relations',
       'access relations',
@@ -46,14 +52,16 @@ class RelationViewsTest extends RelationTestBase {
 
   /**
    * Tests views with relations as a base table.
+   *
+   * @TODO
    */
-  function todo_testRelationsAsBaseTable() {
+  public function todoTestRelationsAsBaseTable() {
     if (!module_exists('views')) {
       return;
     }
 
     foreach (array('symmetric', 'directional', 'octopus') as $relation_type) {
-      $view = new view;
+      $view = new view();
       $view->base_table = 'relation';
       $handler = $view->new_display('default');
       $handler->display->display_options['relationships']['uid']['id'] = 'uid';
@@ -83,21 +91,26 @@ class RelationViewsTest extends RelationTestBase {
           $this->assertEqual($result->rid, 1);
           $this->assertEqual($result->relation_arity, 2);
           break;
+
         case 'directional':
           // Relation #2 is of type directional and has 2 endpoints.
           $this->assertEqual($result->rid, 2);
           $this->assertEqual($result->relation_arity, 2);
           break;
+
         case 'directional_entitysame':
           // Relation #4 is of type directional_entitysame and has 2 endpoints.
           $this->assertEqual($result->rid, 4);
           $this->assertEqual($result->relation_arity, 2);
           break;
+
         case 'directional_entitydifferent':
-          // Relation #7 is of type directional_entitydifferent and has 2 endpoints.
+          // Relation #7 is of type directional_entitydifferent and has 2
+          // endpoints.
           $this->assertEqual($result->rid, 7);
           $this->assertEqual($result->relation_arity, 2);
           break;
+
         case 'octopus':
           // Relation #4 is of type octopus and has 4 endpoints.
           $this->assertEqual($result->rid, 9);
@@ -109,14 +122,16 @@ class RelationViewsTest extends RelationTestBase {
 
   /**
    * Tests views with symmetric relations.
+   *
+   * @TODO
    */
-  function todo_testSymmetricRelations() {
+  public function todoTestSymmetricRelations() {
     if (!module_exists('views')) {
       return;
     }
 
     foreach (array(FALSE, TRUE) as $required) {
-      $view = new view;
+      $view = new view();
       $handler = $view->new_display('default');
       $handler->display->display_options['relationships']['relation_symmetric_node']['id'] = 'relation_symmetric_node';
       $handler->display->display_options['relationships']['relation_symmetric_node']['table'] = 'node';
@@ -165,15 +180,17 @@ class RelationViewsTest extends RelationTestBase {
 
   /**
    * Tests views with directional relations to source, to target and to both.
+   *
+   * @TODO
    */
-  function todo_testDirectionalRelations() {
+  public function todoTestDirectionalRelations() {
     if (!module_exists('views')) {
       return;
     }
 
     foreach (array(FALSE, TRUE) as $required) {
       for ($delta = -1; $delta < 2; $delta++) {
-        $view = new view;
+        $view = new view();
         $handler = $view->new_display('default');
         $handler->display->display_options['relationships']['relation_directional_node']['id'] = 'relation_directional_node';
         $handler->display->display_options['relationships']['relation_directional_node']['table'] = 'node';
@@ -207,12 +224,14 @@ class RelationViewsTest extends RelationTestBase {
             }
             $this->assertFalse($targetmatches);
             break;
+
           case 0:
             // Source. This finds the 3->4 relation.
             $this->assertEqual(count($view->result), 1);
             $this->assertEqual($view->result[0]->nid, $this->node3->nid);
             $this->assertEqual($view->result[0]->node_node_nid, $this->node4->nid);
             break;
+
           case 1:
             // Target. This finds the 1->3 relation.
             $this->assertEqual(count($view->result), 1);
@@ -242,16 +261,24 @@ class RelationViewsTest extends RelationTestBase {
   }
 
   /**
-   * Tests views with forward directional relations to source, to target and to
-   * both with the same entities types.
+   * Tests views with forward directional relations.
+   *
+   * Tests views to source, to target and to both with the same entities types.
+   *
+   * @TODO
    */
-  function todo_testForwardDirectionalSameEntityRelations() {
+  public function todoTestForwardDirectionalSameEntityRelations() {
     if (!module_exists('views')) {
       return;
     }
 
+<<<<<<< HEAD
     for ($delta = -1; $delta < 2; $delta++) {
       $view = new view;
+=======
+    for ($r_index = -1; $r_index < 2; $r_index++) {
+      $view = new view();
+>>>>>>> 8.x-1.x
       $view->base_table = 'node';
       $handler = $view->new_display('default');
       $handler->display->display_options['relationships']['relation_directional_entitysame_node']['id'] = 'relation_directional_entitysame_node';
@@ -273,12 +300,17 @@ class RelationViewsTest extends RelationTestBase {
         case -1:
           // Directional, both ways.
           $this->assertEqual(count($view->result), 3);
-          $matches = array($this->node4->nid => TRUE, $this->node4->nid => TRUE, $this->node5->nid => TRUE);
+          $matches = array(
+            $this->node4->nid => TRUE,
+            $this->node4->nid => TRUE,
+            $this->node5->nid => TRUE,
+          );
           foreach ($view->result as $result) {
             unset($matches[$result->node_node_nid]);
           }
           $this->assertFalse($matches);
           break;
+
         case 0:
           // Source. This finds the p3->p4 and p3->p5 relations.
           $this->assertEqual(count($view->result), 2);
@@ -288,6 +320,7 @@ class RelationViewsTest extends RelationTestBase {
           }
           $this->assertFalse($matches);
           break;
+
         case 1:
           // Target. This finds the p4->p3 relation.
           $this->assertEqual(count($view->result), 1);
@@ -302,12 +335,21 @@ class RelationViewsTest extends RelationTestBase {
   }
 
   /**
-   * Tests views with reverse directional relations to source, to target and to
-   * both with the same entities types.
+   * Tests views with reverse directional relations.
+   *
+   * Tests views to source, to target and to both with the same entities types.
+   *
+   * @TODO
    */
+<<<<<<< HEAD
   function todo_testReverseDirectionalSameEntityRelations() {
     for ($delta = -1; $delta < 2; $delta++) {
       $view = new view;
+=======
+  public function todoTestReverseDirectionalSameEntityRelations() {
+    for ($r_index = -1; $r_index < 2; $r_index++) {
+      $view = new view();
+>>>>>>> 8.x-1.x
       $view->base_table = 'node';
       $handler = $view->new_display('default');
       $handler->display->display_options['relationships']['relation_directional_entitysame_node']['id'] = 'relation_directional_entitysame_node';
@@ -329,12 +371,17 @@ class RelationViewsTest extends RelationTestBase {
         case -1:
           // Directional, both ways.
           $this->assertEqual(count($view->result), 3);
-          $matches = array($this->node4->nid => TRUE, $this->node5->nid => TRUE, $this->node4->nid => TRUE);
+          $matches = array(
+            $this->node4->nid => TRUE,
+            $this->node5->nid => TRUE,
+            $this->node4->nid => TRUE,
+          );
           foreach ($view->result as $result) {
             unset($matches[$result->nid]);
           }
           $this->assertFalse($matches);
           break;
+
         case 0:
           // Reverse source. This finds the p4->p3 relation.
           $this->assertEqual(count($view->result), 1);
@@ -344,6 +391,7 @@ class RelationViewsTest extends RelationTestBase {
           }
           $this->assertFalse($matches);
           break;
+
         case 1:
           // Reverse target. This finds the p3->p4 and p3->p5 relations.
           $this->assertEqual(count($view->result), 2);
@@ -358,12 +406,21 @@ class RelationViewsTest extends RelationTestBase {
   }
 
   /**
-   * Tests views with forward directional relations to source, to target and to
-   * both with different entities types.
+   * Tests views with forward directional relations.
+   *
+   * Tests views to source, to target and to both with different entities types.
+   *
+   * @TODO
    */
+<<<<<<< HEAD
   function todo_testForwardDirectionalDifferentEntityRelations() {
     for ($delta = -1; $delta < 2; $delta++) {
       $view = new view;
+=======
+  public function todoTestForwardDirectionalDifferentEntityRelations() {
+    for ($r_index = -1; $r_index < 2; $r_index++) {
+      $view = new view();
+>>>>>>> 8.x-1.x
       $view->base_table = 'users';
       $handler = $view->new_display('default');
       $handler->display->display_options['relationships']['relation_directional_entitydifferent_node']['id'] = 'relation_directional_entitydifferent_node';
@@ -391,6 +448,7 @@ class RelationViewsTest extends RelationTestBase {
           }
           $this->assertFalse($matches);
           break;
+
         case 0:
           // Source. This finds the u1->p3 and u1->p4 relation.
           $this->assertEqual(count($view->result), 2);
@@ -400,6 +458,7 @@ class RelationViewsTest extends RelationTestBase {
           }
           $this->assertFalse($matches);
           break;
+
         case 1:
           // Target. This finds no relations.
           $this->assertEqual(count($view->result), 0);
@@ -414,12 +473,22 @@ class RelationViewsTest extends RelationTestBase {
   }
 
   /**
-   * Tests views with reverse directional relations to source, to target and to
-   * both with different entities types.
+   * Tests views with reverse directional relations.
+   *
+   * Tests relations to source, to target and to both with different entities
+   * types.
+   *
+   * @TODO
    */
+<<<<<<< HEAD
   function todo_testReverseDirectionalDifferentEntityRelations() {
     for ($delta = -1; $delta < 2; $delta++) {
       $view = new view;
+=======
+  public function todoTestReverseDirectionalDifferentEntityRelations() {
+    for ($r_index = -1; $r_index < 2; $r_index++) {
+      $view = new view();
+>>>>>>> 8.x-1.x
       $view->base_table = 'node';
       $handler = $view->new_display('default');
       $handler->display->display_options['relationships']['relation_directional_entitydifferent_user']['id'] = 'relation_directional_entitydifferent_user';
@@ -447,6 +516,7 @@ class RelationViewsTest extends RelationTestBase {
           }
           $this->assertFalse($matches);
           break;
+
         case 0:
           // Source. This finds no relations.
           $this->assertEqual(count($view->result), 0);
@@ -456,6 +526,7 @@ class RelationViewsTest extends RelationTestBase {
           }
           $this->assertFalse($matches);
           break;
+
         case 1:
           // Target. This finds the u1->p3 and u1->p4 relation.
           $this->assertEqual(count($view->result), 2);
@@ -471,10 +542,12 @@ class RelationViewsTest extends RelationTestBase {
 
   /**
    * Tests views deduplication.
+   *
+   * @TODO
    */
-  function todo_testDeduplication() {
+  public function todoTestDeduplication() {
     for ($i = 0; $i < 2; $i++) {
-      $view = new view;
+      $view = new view();
       $view->base_table = 'node';
       $handler = $view->new_display('default');
       $handler->display->display_options['relationships']['relation_directional_entitydifferent_user']['id'] = 'relation_directional_entitydifferent_user';
@@ -515,4 +588,5 @@ class RelationViewsTest extends RelationTestBase {
       }
     }
   }
+
 }

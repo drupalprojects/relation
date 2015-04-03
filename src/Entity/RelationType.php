@@ -15,9 +15,9 @@ use Drupal\Core\Annotation\Translation;
 use Drupal\Core\Entity\Annotation\EntityType;
 
 /**
- * Defines relation type entity
+ * Defines relation type entity.
  *
- * Properties
+ * Properties.
  *
  *  - relation_type (required): Relation type machine name (string).
  *  - label: Relation type human-readable name (string). Defaults to
@@ -84,7 +84,9 @@ class RelationType extends ConfigEntityBundleBase implements RelationTypeInterfa
   public $label;
 
   /**
-   * The reverse human-readable name of this type. Only used for directional relations.
+   * The reverse human-readable name of this type.
+   *
+   * Only used for directional relations.
    *
    * @var string
    */
@@ -210,4 +212,5 @@ class RelationType extends ConfigEntityBundleBase implements RelationTypeInterfa
     }
     return $bundles;
   }
+
 }

@@ -96,4 +96,5 @@ class RelationController extends ControllerBase {
   public function pageTitle(RelationInterface $relation) {
     return String::checkPlain($relation->label());
   }
+
 }

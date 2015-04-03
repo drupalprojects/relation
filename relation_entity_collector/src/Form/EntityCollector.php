@@ -34,13 +34,13 @@ class EntityCollector extends FormBase {
     $relation_types_options = relation_get_relation_types_options();
     if (empty($relation_types_options)) {
       $form['explanation']['#markup'] = $this->t('Before you can create relations, you need to create one or more <a href="@url">relation types</a>. Once you\'ve done that, visit any page that loads one or more entities, and use this block to add entities to a new relation. Picked entities stay in the entity_collector until cleared or a relation is created so it is possible to collect the entities from several pages.', array(
-        '@url' => $this->url('entity.relation_type.collection')
+        '@url' => $this->url('entity.relation_type.collection'),
       ));
       return $form;
     }
 
     $relation_type = isset($_SESSION['relation_type']) ? $_SESSION['relation_type'] : '';
-    // forget the selected relation type if it's no longer available
+    // Forget the selected relation type if it's no longer available.
     if (!isset($relation_types_options[$relation_type])) {
       unset($_SESSION['relation_type']);
       $relation_type = '';
@@ -94,7 +94,7 @@ class EntityCollector extends FormBase {
       '#options'        => $storage['relation_entities_options'],
       '#default_value'  => '',
       '#description'     => $this->t('Selector shows all !entities loaded on this page.', array(
-        '!entities' => $this->l($this->t('entities'), Url::fromUri('http://drupal.org/glossary#entity'))
+        '!entities' => $this->l($this->t('entities'), Url::fromUri('http://drupal.org/glossary#entity')),
       )),
     );
     $form['pick'] = array(
@@ -216,6 +216,7 @@ class EntityCollector extends FormBase {
         _relation_entity_collector_endpoints_validate($relation, $form, $form_state);
         field_attach_form_validate('relation', $relation, $form, $form_state);
         break;
+
       case t('Save relation'):
         _relation_entity_collector_endpoints_validate(_relation_entity_collector_get_entity(), $form, $form_state);
         break;
@@ -223,7 +224,7 @@ class EntityCollector extends FormBase {
   }
 
   /**
-   * Validate relation endpoints
+   * Validate relation endpoints.
    */
   public function validateEndpoints($relation, array &$form, FormStateInterface $form_state) {
     // Perform field_level validation.
@@ -304,4 +305,5 @@ class EntityCollector extends FormBase {
     unset($_SESSION['relation_type'], $_SESSION['relation_entity_keys'], $_SESSION['relation_edit']);
     $form_state['rebuild'] = TRUE;
   }
+
 }

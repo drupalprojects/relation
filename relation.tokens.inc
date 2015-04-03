@@ -32,10 +32,10 @@ function relation_token_info() {
     'name' => t("Relation type label"),
     'description' => t("The human-readable name of the relation type."),
   );
-//   $relation['title'] = array(
-//     'name' => t("Title"),
-//     'description' => t("The title of the relation."),
-//   );
+  //   $relation['title'] = array(
+  //     'name' => t("Title"),
+  //     'description' => t("The title of the relation."),
+  //   );
   $relation['url'] = array(
     'name' => t("URL"),
     'description' => t("The URL of the relation."),

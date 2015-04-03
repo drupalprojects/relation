@@ -10,7 +10,7 @@ namespace Drupal\relation;
 use Drupal\Core\Entity\Sql\SqlContentEntityStorage;
 
 /**
- * Relation controller class
+ * Relation controller class.
  *
  * This extends the SqlContentEntityStorage class, adding required special
  * handling for relation revisions, very similar to what's being done with
@@ -18,7 +18,7 @@ use Drupal\Core\Entity\Sql\SqlContentEntityStorage;
  */
 class RelationStorage extends SqlContentEntityStorage {
   /**
-   * TODO, what's this?
+   * TODO, what's this?.
    */
   public function create(array $values = array()) {
     $account = \Drupal::currentUser();
@@ -33,7 +33,7 @@ class RelationStorage extends SqlContentEntityStorage {
    * {@inheritdoc}
    */
   protected function buildQuery($ids, $revision_id = FALSE) {
-    // Ensure that uid is taken from the {relation} table
+    // Ensure that uid is taken from the {relation} table.
     $query = parent::buildQuery($ids, $revision_id);
     $fields =& $query->getFields();
     $fields['uid']['table'] = 'base';
@@ -42,4 +42,5 @@ class RelationStorage extends SqlContentEntityStorage {
     $query->addField('revision', 'changed', 'changed');
     return $query;
   }
+
 }
