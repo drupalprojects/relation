@@ -441,7 +441,7 @@ function relation_entity_delete(Drupal\Core\Entity\EntityInterface $entity) {
   }
   if (!empty($relations_to_delete)) {
     entity_delete_multiple('relation', $relations_to_delete);
-    watchdog('relation', t('Relations @relations have been deleted.', array('@relations' => implode(', ', $relations_to_delete))));
+    \Drupal::logger('relation')->error('Relations @relations have been deleted.', array('@relations' => implode(', ', $relations_to_delete)));
   }
 }
 
