@@ -289,7 +289,8 @@ function relation_query_add_related(QueryInterface $query, $entity_type, $entity
     ->condition('endpoints.entity_type', $entity_type, '=');
 
   if (isset($entity_id)) {
-    $group->condition('endpoints.entity_id', $entity_id, NULL);
+    $operator = is_array($entity_id) ? 'IN' : '=';
+    $group->condition('endpoints.entity_id', $entity_id, $operator);
   }
 
   if (isset($r_index)) {
