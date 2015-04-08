@@ -29,6 +29,7 @@ use Drupal\Core\Render\Element;
 use Drupal\Core\Url;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\relation\RelationTypeInterface;
+use Drupal\Core\Entity\Query\QueryInterface;
 
 /**
  * Implements hook_theme().
@@ -269,7 +270,7 @@ function relation_query($entity_type = NULL, $entity_id = NULL, $r_index = NULL)
 /**
  * Add a related entity to the query.
  *
- * @param \Drupal\Core\Entity\Query\QueryInterface $query
+ * @param QueryInterface $query
  *   The query object.
  * @param string $entity_type
  *   Entity type of the related entity.
