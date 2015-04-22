@@ -163,6 +163,10 @@ function relation_permission() {
     'export relation types' => array(
       'title' => t('Export Relation types'),
     ),
+    'use relation import' => array(
+      'title' => t('Use Relation import'),
+      'restrict access' => TRUE,
+    ),
     'access relations' => array(
       'title' => t('View Relations'),
       'description' => t('Grant access to view the endpoints of Relations.'),
