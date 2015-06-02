@@ -10,22 +10,15 @@ namespace Drupal\relation\Tests;
 use Drupal\Core\Language\Language;
 
 /**
+ * Relation Rules integration.
+ *
  * Functional test of Relation's integration with Rules.
+ *
+ * @group Relation
  */
 class RelationRulesTest extends RelationTestBase {
 
   public static $modules = array('relation', 'node', 'rules');
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function getInfo() {
-    return array(
-      'name' => 'Relation Rules integration test',
-      'description' => 'Test the Rules integration.',
-      'group' => 'Relation',
-    );
-  }
 
   /**
    * {@inheritdoc}

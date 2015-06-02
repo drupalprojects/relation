@@ -10,25 +10,16 @@ namespace Drupal\relation\Tests;
 use Drupal\Core\Language\Language;
 
 /**
- * Tests Relation API.
+ * Test general API for Relation.
  *
  * Create nodes, add relations and verify that they are related.
  * This test suite also checks all methods available in RelationQuery.
+ *
+ * @group Relation
  */
 class RelationAPITest extends RelationTestBase {
 
   public static $modules = array('node');
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function getInfo() {
-    return array(
-      'name' => 'Relation API',
-      'description' => 'Test general API for relation.',
-      'group' => 'Relation',
-    );
-  }
 
   /**
    * {@inheritdoc}

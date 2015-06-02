@@ -10,24 +10,15 @@ namespace Drupal\relation\Tests;
 use Drupal\relation\Tests\RelationTestBase;
 
 /**
- * Tests Relation UI.
+ * Relation UI.
  *
  * Check that relation administration interface works.
+ *
+ * @group Relation
  */
 class RelationUITest extends RelationTestBase {
 
   public static $modules = array('node', 'field_ui');
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function getInfo() {
-    return array(
-      'name' => 'Relation UI test',
-      'description' => 'Tests Relation UI.',
-      'group' => 'Relation',
-    );
-  }
 
   /**
    * {@inheritdoc}
