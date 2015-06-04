@@ -20,16 +20,14 @@
  */
 const RELATION_FIELD_NAME = 'endpoints';
 
-use Drupal\Core\Language\Language;
-use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
-use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Url;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\relation\RelationTypeInterface;
 use Drupal\Core\Entity\Query\QueryInterface;
+use Drupal\Core\Field\FieldItemListInterface;
 
 /**
  * Implements hook_theme().
@@ -183,10 +181,11 @@ function relation_query_enforce_distinct_endpoints_alter(Drupal\Core\Database\Qu
 /**
  * Clear the cache for a set of endpoints.
  *
- * @param array $endpoints
- *   An array of endpoints, with entity_type and entity_id as keys.
+ * @param \Drupal\Core\Field\FieldItemListInterface  $endpoints
+ *   List of relation endpoint field items with entity_type and entity_id
+ *   values in individual field items.
  */
-function relation_clear_related_entities_cache(array $endpoints) {
+function relation_clear_related_entities_cache(FieldItemListInterface $endpoints) {
   drupal_static_reset('relation_get_related_entity');
   foreach ($endpoints as $endpoint) {
     \Drupal::cache()->delete('relation:' . $endpoint->entity_type . ':' . $endpoint->entity_id, 'cache', TRUE);
