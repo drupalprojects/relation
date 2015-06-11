@@ -7,7 +7,7 @@
 
 namespace Drupal\relation\Controller;
 
-use Drupal\Component\Utility\String;
+use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\relation\RelationInterface;
 
@@ -38,7 +38,7 @@ class RelationController extends ControllerBase {
    *   The page title.
    */
   public function pageTitle(RelationInterface $relation) {
-    return String::checkPlain($relation->label());
+    return SafeMarkup::checkPlain($relation->label());
   }
 
 }
