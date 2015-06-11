@@ -8,6 +8,7 @@
 namespace Drupal\relation\Tests;
 
 use Drupal\simpletest\WebTestBase;
+use Drupal\relation\Entity\RelationType;
 
 /**
  * Provides common helper methods for Taxonomy module tests.
@@ -174,7 +175,7 @@ abstract class RelationTestBase extends WebTestBase {
       'source_bundles' => array('node:page'),
     );
     foreach ($this->relation_types as $values) {
-      $relation_type = entity_create('relation_type', $values);
+      $relation_type = RelationType::create($values);
       $relation_type->save();
     }
   }

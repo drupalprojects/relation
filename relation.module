@@ -12,7 +12,7 @@
  *
  * @code
  * // Create a relation field.
- * $relation_field = entity_create('field_entity', array('entity_type' => $entity_type, 'name' => RELATION_FIELD_NAME));
+ * $relation_field = FieldStorageConfig::create(array('entity_type' => $entity_type, 'name' => RELATION_FIELD_NAME));
  *
  * // Load a relation field.
  * $relation_field = entity_load('field_entity', $entity_type . RELATION_FIELD_NAME);
@@ -28,6 +28,7 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\relation\RelationTypeInterface;
 use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\Core\Field\FieldItemListInterface;
+use Drupal\relation\Entity\Relation;
 
 /**
  * Implements hook_theme().
@@ -213,7 +214,7 @@ function relation_clear_related_entities_cache(FieldItemListInterface $endpoints
  *   A saved relation.
  */
 function relation_insert($relation_type, array $endpoints) {
-  $relation = entity_create('relation', array('relation_type' => $relation_type));
+  $relation = Relation::create(array('relation_type' => $relation_type));
   $relation->endpoints = $endpoints;
   $relation->save();
   return $relation;
@@ -474,7 +475,7 @@ function relation_add_endpoint_field(RelationTypeInterface $relation_type) {
   $instance = FieldConfig::loadByName('relation', $relation_type->id(), RELATION_FIELD_NAME);
 
   if (empty($field)) {
-    $field = entity_create('field_storage_config', array(
+    $field = FieldStorageConfig::create(array(
       'field_name' => RELATION_FIELD_NAME,
       'entity_type' => 'relation',
       'cardinality' => FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED,
@@ -486,7 +487,7 @@ function relation_add_endpoint_field(RelationTypeInterface $relation_type) {
 
   if ($field && empty($instance)) {
     // Attach field instance.
-    $instance = entity_create('field_config', array(
+    $instance = FieldConfig::create(array(
       'field_storage' => $field,
       'bundle' => $relation_type->id(),
       'label' => t('Endpoints'),
