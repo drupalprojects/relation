@@ -10,22 +10,15 @@ namespace Drupal\relation_dummy_field\Tests;
 use Drupal\relation\Tests\RelationTestBase;
 
 /**
+ * Tests the Relation Dummy Field.
+ *
  * Functional test of Relation's integration with the Dummy Field.
+ *
+ * @group Relation
  */
 class RelationDummyFieldTest extends RelationTestBase {
 
   public static $modules = array('relation_dummy_field');
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function getInfo() {
-    return array(
-      'name' => 'Relation Dummy Field test',
-      'description' => 'Tests the Relation Dummy Field.',
-      'group' => 'Relation',
-    );
-  }
 
   /**
    * {@inheritdoc}

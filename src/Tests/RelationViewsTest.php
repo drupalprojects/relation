@@ -8,22 +8,15 @@
 namespace Drupal\relation\Tests;
 
 /**
+ * Relation Views test
+ *
  * Functional test of Relation's integration with Views.
+ *
+ * @group Relation
  */
 class RelationViewsTest extends RelationTestBase {
 
   public static $modules = array('node', 'views');
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function getInfo() {
-    return array(
-      'name' => 'Relation Views test',
-      'description' => 'Tests the Relation Views support.',
-      'group' => 'Relation',
-    );
-  }
 
   /**
    * {@inheritdoc}

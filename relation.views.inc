@@ -4,7 +4,8 @@
  * @file
  */
 
-use Drupal\Component\Utility\String;
+use Drupal\Component\Utility\SafeMarkup;
+use Drupal\Core\Render\Element;
 
 /**
  * @file
@@ -237,8 +238,8 @@ function relation_views_data_alter(&$data) {
           'title' => t('Relation: @relation_type_label (@left → relation)', $placeholders),
           'help' => t('Provides a relationship from @left to the relation table via the relation @relation_type_label', $placeholders),
           'relationship' => array(
-            // relation_handler_relationship::options_form() relies on this String::checkPlain().
-            'label' => String::checkPlain($relation_type->label),
+            // relation_handler_relationship::options_form() relies on this SafeMarkup::checkPlain().
+            'label' => SafeMarkup::checkPlain($relation_type->label),
             'base' => 'relation',
             'base field' => 'rid',
             'relationship field' => $entity_info[$source_entity_type]->getKey('id'),
@@ -261,8 +262,8 @@ function relation_views_data_alter(&$data) {
             'title' => t('Relation: @relation_type_label (@left @arrow @right)', $placeholders),
             'help' => t('Provides a relationship from @left to @right via the relation @relation_type_label', $placeholders),
             'relationship' => array(
-              // relation_handler_relationship::options_form() relies on this String::checkPlain().
-              'label' => String::checkPlain($relation_type->label),
+              // relation_handler_relationship::options_form() relies on this SafeMarkup::checkPlain().
+              'label' => SafeMarkup::checkPlain($relation_type->label),
               'base' => $target_table,
               'base field' => $entity_info[$target_entity_type]->getKey('id'),
               'relationship field' => $entity_info[$source_entity_type]->getKey('id'),
@@ -280,8 +281,8 @@ function relation_views_data_alter(&$data) {
             'title' => t('Relation: @relation_type_label (relation → @right)', $placeholders),
             'help' => t('Provides a relationship from the relation table to @right via the relation @relation_type_label', $placeholders),
             'relationship' => array(
-              // relation_handler_relationship::options_form() relies on this String::checkPlain().
-              'label' => String::checkPlain($relation_type->label),
+              // relation_handler_relationship::options_form() relies on this SafeMarkup::checkPlain().
+              'label' => SafeMarkup::checkPlain($relation_type->label),
               'base' => $target_table,
               'base field' => $entity_info[$target_entity_type]->getKey('id'),
               'relationship field' => 'rid',
@@ -300,8 +301,8 @@ function relation_views_data_alter(&$data) {
               'title' => t('Relation: @relation_type_reverse_label (@right @arrow @left)', $placeholders),
               'help' => t('Provides a relationship from @right to @left via the relation @relation_type_reverse_label', $placeholders),
               'relationship' => array(
-                // relation_handler_relationship::options_form() relies on this String::checkPlain().
-                'label' => String::checkPlain($relation_type->reverse_label),
+                // relation_handler_relationship::options_form() relies on this SafeMarkup::checkPlain().
+                'label' => SafeMarkup::checkPlain($relation_type->reverse_label),
                 'base' => $source_table,
                 'base field' => $entity_info[$source_entity_type]->getKey('id'),
                 'relationship field' => $entity_info[$target_entity_type]->getKey('id'),
@@ -319,8 +320,8 @@ function relation_views_data_alter(&$data) {
               'title' => t('Relation: @relation_type_reverse_label (@right → relation)', $placeholders),
               'help' => t('Provides a relationship from @right to the relation table via the relation @relation_type_reverse_label. Usually only needed to access the fields of the relation itself.', $placeholders),
               'relationship' => array(
-                // relation_handler_relationship::options_form() relies on this String::checkPlain().
-                'label' => String::checkPlain($relation_type->reverse_label),
+                // relation_handler_relationship::options_form() relies on this SafeMarkup::checkPlain().
+                'label' => SafeMarkup::checkPlain($relation_type->reverse_label),
                 'base' => 'relation',
                 'base field' => 'rid',
                 'relationship field' => $entity_info[$target_entity_type]->getKey('id'),
@@ -337,8 +338,8 @@ function relation_views_data_alter(&$data) {
               'title' => t('Relation: @relation_type_reverse_label (relation → @left)', $placeholders),
               'help' => t('Provides a relationship from the relation table to @left via the relation @relation_type_reverse_label', $placeholders),
               'relationship' => array(
-                // relation_handler_relationship::options_form() relies on this String::checkPlain().
-                'label' => String::checkPlain($relation_type->reverse_label),
+                // relation_handler_relationship::options_form() relies on this SafeMarkup::checkPlain().
+                'label' => SafeMarkup::checkPlain($relation_type->reverse_label),
                 'base' => $source_table,
                 'base field' => $entity_info[$source_entity_type]->getKey('id'),
                 'relationship field' => 'rid',
@@ -379,7 +380,7 @@ function relation_form_views_ui_add_item_form_alter(&$form, $form_state) {
     if ($preg_pieces) {
       // Filter out impossible Views relationships.
       $relation_type_preg = '/' . implode('|', array_unique($preg_pieces)) . '/';
-      foreach (element_children($form['options']['name']) as $name) {
+      foreach (Element::children($form['options']['name']) as $name) {
         if (substr($name, 0, 9) == 'relation.' && !preg_match($relation_type_preg, $name)) {
           $form['options']['name'][$name]['#access'] = FALSE;
         }

@@ -133,7 +133,6 @@ class Relation extends ContentEntityBase implements RelationInterface {
    * {@inheritdoc}
    */
   public function preSave(EntityStorageInterface $storage) {
-    $this->changed = REQUEST_TIME;
     $this->arity = count($this->endpoints);
   }
 

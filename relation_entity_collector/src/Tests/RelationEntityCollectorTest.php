@@ -10,21 +10,14 @@ namespace Drupal\relation_entity_collector\Tests;
 use Drupal\relation\Tests\RelationTestBase;
 
 /**
+ * Tests the Relation Entity Collector.
+ *
  * Functional test of Relation's integration with the Entity Collector.
+ *
+ * @group Relation
  */
 class RelationEntityCollectorTest extends RelationTestBase {
   public static $modules = array('node', 'relation_entity_collector');
-
-  /**
-   *
-   */
-  public static function getInfo() {
-    return array(
-      'name' => 'Relation Entity Collector test',
-      'description' => 'Tests the Relation Entity Collector.',
-      'group' => 'Relation',
-    );
-  }
 
   /**
    *

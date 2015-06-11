@@ -12,7 +12,7 @@
  *
  * @code
  * // Create a relation field.
- * $relation_field = entity_create('field_entity', array('entity_type' => $entity_type, 'name' => RELATION_FIELD_NAME));
+ * $relation_field = FieldStorageConfig::create(array('entity_type' => $entity_type, 'name' => RELATION_FIELD_NAME));
  *
  * // Load a relation field.
  * $relation_field = entity_load('field_entity', $entity_type . RELATION_FIELD_NAME);
@@ -20,15 +20,15 @@
  */
 const RELATION_FIELD_NAME = 'endpoints';
 
-use Drupal\Core\Language\Language;
-use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
-use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Url;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\relation\RelationTypeInterface;
+use Drupal\Core\Entity\Query\QueryInterface;
+use Drupal\Core\Field\FieldItemListInterface;
+use Drupal\relation\Entity\Relation;
 
 /**
  * Implements hook_theme().
@@ -182,10 +182,11 @@ function relation_query_enforce_distinct_endpoints_alter(Drupal\Core\Database\Qu
 /**
  * Clear the cache for a set of endpoints.
  *
- * @param array $endpoints
- *   An array of endpoints, with entity_type and entity_id as keys.
+ * @param \Drupal\Core\Field\FieldItemListInterface  $endpoints
+ *   List of relation endpoint field items with entity_type and entity_id
+ *   values in individual field items.
  */
-function relation_clear_related_entities_cache(array $endpoints) {
+function relation_clear_related_entities_cache(FieldItemListInterface $endpoints) {
   drupal_static_reset('relation_get_related_entity');
   foreach ($endpoints as $endpoint) {
     \Drupal::cache()->delete('relation:' . $endpoint->entity_type . ':' . $endpoint->entity_id, 'cache', TRUE);
@@ -213,7 +214,7 @@ function relation_clear_related_entities_cache(array $endpoints) {
  *   A saved relation.
  */
 function relation_insert($relation_type, array $endpoints) {
-  $relation = entity_create('relation', array('relation_type' => $relation_type));
+  $relation = Relation::create(array('relation_type' => $relation_type));
   $relation->endpoints = $endpoints;
   $relation->save();
   return $relation;
@@ -269,24 +270,33 @@ function relation_query($entity_type = NULL, $entity_id = NULL, $delta = NULL) {
 /**
  * Add a related entity to the query.
  *
- * @param \Drupal\Core\Entity\Query\QueryInterface $query
+ * @param QueryInterface $query
  *   The query object.
  * @param string $entity_type
  *   Entity type of the related entity.
  * @param int $entity_id
- *   Entity id of the related entity. Can be an array of entity IDs.
+ *   (optional) Entity id of the related entity. Can be an array of entity IDs.
  * @param int|null $delta
- *   The index of the related entity within the requested relation(s).
+ *   (optional) The index of the related entity within the requested
+ *   relation(s).
  *
  * @todo rename. / extend class ala RelationQuery::related()
  *
  * @return Drupal\Core\Entity\Query\QueryInterface
  *   The query object
  */
-function relation_query_add_related(QueryInterface $query, $entity_type, $entity_id, $delta = NULL) {
+function relation_query_add_related(QueryInterface $query, $entity_type, $entity_id = NULL, $delta = NULL) {
   $group = $query->andConditionGroup()
-    ->condition("endpoints.{$delta_condition}target_type", $entity_type, '=')
-    ->condition("endpoints.{$delta_condition}target_id", $entity_id, NULL);
+    ->condition('endpoints.entity_type', $entity_type, '=');
+
+  if (isset($entity_id)) {
+    $operator = is_array($entity_id) ? 'IN' : '=';
+    $group->condition('endpoints.entity_id', $entity_id, $operator);
+  }
+
+  if (isset($delta)) {
+    $group->condition('endpoints.?', $delta, '=');
+  }
 
   $query->condition($group);
   return $query;
@@ -465,7 +475,7 @@ function relation_add_endpoint_field(RelationTypeInterface $relation_type) {
   $instance = FieldConfig::loadByName('relation', $relation_type->id(), RELATION_FIELD_NAME);
 
   if (empty($field)) {
-    $field = entity_create('field_storage_config', array(
+    $field = FieldStorageConfig::create(array(
       'field_name' => RELATION_FIELD_NAME,
       'entity_type' => 'relation',
       'cardinality' => FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED,
@@ -477,7 +487,7 @@ function relation_add_endpoint_field(RelationTypeInterface $relation_type) {
 
   if ($field && empty($instance)) {
     // Attach field instance.
-    $instance = entity_create('field_config', array(
+    $instance = FieldConfig::create(array(
       'field_storage' => $field,
       'bundle' => $relation_type->id(),
       'label' => t('Endpoints'),
