@@ -6,8 +6,7 @@ package = Relation
 files[] = relation_migrate.destination.inc
 files[] = relation_migrate.source.inc
 files[] = relation_migrate.migration.inc
-; @see https://www.drupal.org/node/2397171
-;files[] = tests/relation.migrate.test
+files[] = tests/relation.migrate.test
 
 dependencies[] = relation
 dependencies[] = relation_ui
