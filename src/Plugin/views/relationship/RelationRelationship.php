@@ -51,7 +51,7 @@ class RelationRelationship extends RelationshipStandard {
         '#title' => t('Position of the relationship base'),
         '#default_value' => $this->options['delta'],
         // check_plain()'d in the definition.
-        '#description' => t('Select whether the entity you are adding the relationship to is source or target of !relation_type_label relation.', array('!relation_type_label' => $this->definition['label'])),
+        '#description' => t('Select whether the entity you are adding the relationship to is source or target of @relation_type_label relation.', array('@relation_type_label' => $this->definition['label'])),
       );
     }
     foreach (array('left', 'right') as $key) {

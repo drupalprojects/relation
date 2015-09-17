@@ -7,7 +7,6 @@
 
 namespace Drupal\relation\Controller;
 
-use Drupal\Component\Utility\String;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\relation\RelationInterface;
 use Drupal\relation\RelationTypeInterface;
@@ -94,7 +93,7 @@ class RelationController extends ControllerBase {
    *   The page title.
    */
   public function pageTitle(RelationInterface $relation) {
-    return String::checkPlain($relation->label());
+    return $relation->label();
   }
 
 }

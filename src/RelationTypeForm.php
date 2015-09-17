@@ -7,10 +7,8 @@
 
 namespace Drupal\relation;
 
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Entity\EntityForm;
-use Drupal\Component\Utility\String;
 
 /**
  * Form controller for relation edit form.
@@ -25,7 +23,7 @@ class RelationTypeForm extends EntityForm {
 
     $relation_type = $this->entity;
     if ($this->operation == 'add') {
-      $form['#title'] = String::checkPlain($this->t('Add relation type'));
+      $form['#title'] = $this->t('Add relation type');
     }
     elseif ($this->operation == 'edit') {
       $form['#title'] = $this->t('Edit %label relation type', array('%label' => $relation_type->label()));
