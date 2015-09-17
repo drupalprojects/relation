@@ -1,9 +1,7 @@
 <?php
 
 require_once dirname(__FILE__) . '/relation.rules.inc';
-if (module_exists('ctools')) {
-  require_once dirname(__FILE__) . '/relation.ctools.inc';
-}
+require_once dirname(__FILE__) . '/relation.ctools.inc';
 
 /**
  * @file
