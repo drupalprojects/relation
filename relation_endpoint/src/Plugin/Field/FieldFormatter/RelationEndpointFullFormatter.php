@@ -27,9 +27,8 @@ class RelationEndpointFullFormatter extends FormatterBase {
   /**
    * {@inheritdoc}
    */
-  public function viewElements(FieldItemListInterface $items) {
-    $build = array();
-    $entities = array();
+  public function viewElements(FieldItemListInterface $items, $langcode) {
+    $build = [];
 
     foreach ($items as $delta => $item) {
       if ($entity = entity_load($item->entity_type, $item->entity_id)) {

@@ -30,25 +30,25 @@ class RelationEndpointFormatter extends FormatterBase {
   /**
    * {@inheritdoc}
    */
-  public function viewElements(FieldItemListInterface $items) {
-    $rows = array();
+  public function viewElements(FieldItemListInterface $items, $langcode) {
+    $rows = [];
 
-    $header = array(
-      array('data' => t('Entity type')),
-      array('data' => t('Entity ID')),
-      array('data' => t('Label')),
-    );
+    $header = [
+      ['data' => t('Entity type')],
+      ['data' => t('Entity ID')],
+      ['data' => t('Label')],
+    ];
 
     foreach ($items as $item) {
-      $t = array('@entity_type' => $item->entity_type, '@entity_id' => $item->entity_id);
+      $t = ['@entity_type' => $item->entity_type, '@entity_id' => $item->entity_id];
 
       try {
         if ($entity = entity_load($item->entity_type, $item->entity_id)) {
           $label = $entity->label();
-          $label_cell['data'] = array(
+          $label_cell['data'] = [
             '#type' => 'link',
             '#title' => (!empty($label) && strlen($label) > 0) ? $label : t('Untitled', $t),
-          ) + $entity->urlInfo()->toRenderArray();
+          ] + $entity->urlInfo()->toRenderArray();
         }
         else {
           $label_cell = t('Deleted');
@@ -61,11 +61,11 @@ class RelationEndpointFormatter extends FormatterBase {
       $rows[] = array($item->entity_type, $item->entity_id, $label_cell);
     }
 
-    return array(
+    return [
       '#theme' => 'table',
       '#header' => $header,
       '#rows' => $rows,
-    );
+    ];
   }
 
 }
