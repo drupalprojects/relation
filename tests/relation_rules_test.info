@@ -3,4 +3,5 @@ description = "Support module for the Relation - Rules integration tests."
 package = Testing
 core = 7.x
 hidden = TRUE
+dependencies[] = relation
 dependencies[] = rules

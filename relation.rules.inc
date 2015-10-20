@@ -274,7 +274,7 @@ function relation_rules_load_related($source_entity, $relation_type, $entity_typ
           if (empty($entity_type_op) || $entity_type_op == $property['target_type']) {
             $endpoint_wrapper = entity_metadata_wrapper($property['target_type'], $related_entity);
             if ($endpoint_wrapper->type() != $source_entity_type || $endpoint_wrapper->getIdentifier() != $source_entity_id) {
-              $endpoints[] = $related_entity;
+              $endpoints[] = $endpoint_wrapper;
             }
           }
         }
