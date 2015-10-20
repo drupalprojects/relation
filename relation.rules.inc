@@ -437,7 +437,16 @@ function relation_rules_fetch_endpoint($relation, $entity_type, $number = 1) {
     }
   }
   if ($entity_ids) {
-    $return = entity_load($entity_type, $entity_ids);
+    // Rules expects items in a list to be indexed from zero not by the entity ID as entity_load()
+    // provides the list. array_values($entities) works, but the order should match that of the
+    // endpoint field which cannot be guaranteed from entity_load(). As such a new list is created
+    // for the entities in the expected order.
+    $entities = entity_load($entity_type, $entity_ids);
+    $return = array();
+    foreach ($entity_ids as $entities_id) {
+      $return[] = $entities[$entities_id];
+    }
+
     // Return a list unless we are only supposed to return a single entity.
     if (1 == $number) {
       $return = reset($return);
