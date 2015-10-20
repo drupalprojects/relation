@@ -186,7 +186,6 @@ function relation_rules_get_related_entities($entity, array $options, $name, $ty
   $source_entity_id = $source_entity->getIdentifier();
   $results = relation_query($source_entity_type, $source_entity_id)
     ->entityCondition('bundle', $info['relation_type'])
-    ->range(0, 50)
     ->execute();
   $rids = array_keys($results);
   $entities_ids = array();
