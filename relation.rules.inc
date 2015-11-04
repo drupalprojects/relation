@@ -122,17 +122,7 @@ function relation_rules_get_endpoints($relation, array $options, $property_name,
  * Entity-type specific property getter callback.
  */
 function relation_rules_get_specific_endpoints($relation, array $options, $property_name, $entity_type, $info) {
-  if ($info['endpoint_type'] == 'source') {
-    if ($info['relation_directional']) {
-      $endpoints = array($relation->endpoints[LANGUAGE_NONE][0]);
-    }
-    else {
-      $endpoints = $relation->endpoints[LANGUAGE_NONE];
-    }
-  }
-  else {
-    $endpoints = array_slice($relation->endpoints[LANGUAGE_NONE], 1);
-  }
+  $endpoints = relation_get_endpoints_by_endpoint_type($relation, $info['endpoint_type']);
 
   $array = array();
   foreach ($endpoints as $endpoint) {
