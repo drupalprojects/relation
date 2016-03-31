@@ -6,6 +6,7 @@
  */
 
 use Drupal\Core\Language\Language;
+use Drupal\Core\Render\Element;
 
 /**
  * Implements hook_rules_event_info().
@@ -238,7 +239,7 @@ function relation_rules_load_related_form_alter(&$form, &$form_state, $options, 
 
   if ($first_step) {
     // In the first step only show relevant parameters.
-    foreach (element_children($form['parameter']) as $key) {
+    foreach (Element::children($form['parameter']) as $key) {
       if (($key != 'relation_type') && ($key != 'left')) {
         unset($form['parameter'][$key]);
       }
@@ -378,7 +379,7 @@ function relation_rules_fetch_endpoint_form_alter(&$form, &$form_state, $options
 
   if ($first_step  || $second_step) {
     // In the first step and second step only show relevant parameters.
-    foreach (element_children($form['parameter']) as $key) {
+    foreach (Element::children($form['parameter']) as $key) {
       if (($key != 'relation') && !($second_step && ($key == 'entity_type'))) {
         unset($form['parameter'][$key]);
       }

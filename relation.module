@@ -55,7 +55,7 @@ function template_preprocess_relation(&$variables) {
   $variables['relation'] = $variables['elements']['#relation'];
 
   $variables += array('content' => array());
-  foreach (element_children($variables['elements']) as $key) {
+  foreach (Element::children($variables['elements']) as $key) {
     $variables['content'][$key] = $variables['elements'][$key];
   }
 }

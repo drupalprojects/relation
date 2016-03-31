@@ -6,6 +6,7 @@
  */
 
 use Drupal\Core\Language\Language;
+use Drupal\Core\Render\Element;
 
 /**
  * Implements hook_theme().
@@ -132,7 +133,7 @@ function theme_relation_entity_collector_table($variables) {
   $table['attributes']['id'] = 'relation-entity-collector-table';
   $table['rows'] = array();
   drupal_add_tabledrag($table['attributes']['id'], 'order', 'sibling', 'relation-entity-collector-weight');
-  foreach (element_children($form['weight']) as $key) {
+  foreach (Element::children($form['weight']) as $key) {
     $form['weight'][$key]['#attributes']['class'] = array('relation-entity-collector-weight');
     $data = array($form['remove'][$key]['#entity_key']['entity_label']);
     foreach ($form['#entity_collector_columns'] as $column) {
