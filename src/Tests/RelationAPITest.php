@@ -1,13 +1,6 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\relation\Tests\RelationAPITest.
- */
-
 namespace Drupal\relation\Tests;
-
-use Drupal\Core\Language\Language;
 
 /**
  * Test general API for Relation.
@@ -19,8 +12,6 @@ use Drupal\Core\Language\Language;
  */
 class RelationAPITest extends RelationTestBase {
 
-  public static $modules = array('node');
-
   /**
    * {@inheritdoc}
    */
@@ -30,7 +21,7 @@ class RelationAPITest extends RelationTestBase {
     parent::setUp();
 
     // Defines users and permissions.
-    $permissions = array(
+    $permissions = [
       // Node.
       'create article content',
       'create page content',
@@ -41,7 +32,7 @@ class RelationAPITest extends RelationTestBase {
       'create relations',
       'edit relations',
       'delete relations',
-    );
+    ];
     $this->web_user = $this->drupalCreateUser($permissions);
     $this->drupalLogin($this->web_user);
   }
@@ -63,15 +54,15 @@ class RelationAPITest extends RelationTestBase {
     // Where endpoints does not exist.
     $endpoints_do_not_exist = $this->endpoints;
     $endpoints_do_not_exist[1]['entity_type'] = $this->randomMachineName();
-    $this->assertEqual(array(), relation_relation_exists($endpoints_do_not_exist, $this->relation_type_symmetric), 'Relation with non-existant endpoint not found.');
+    $this->assertEqual([], relation_relation_exists($endpoints_do_not_exist, $this->relation_type_symmetric), 'Relation with non-existant endpoint not found.');
 
     // Where there are too many endpoints.
     $endpoints_excessive = $this->endpoints;
-    $endpoints_excessive[] = array('entity_type' => $this->randomMachineName(), 'entity_id' => 1000);
-    $this->assertEqual(array(), relation_relation_exists($endpoints_do_not_exist, $this->relation_type_symmetric), 'Relation with too many endpoints not found.');
+    $endpoints_excessive[] = ['entity_type' => $this->randomMachineName(), 'entity_id' => 1000];
+    $this->assertEqual([], relation_relation_exists($endpoints_do_not_exist, $this->relation_type_symmetric), 'Relation with too many endpoints not found.');
 
     // Where relation type is invalid.
-    $this->assertEqual(array(), relation_relation_exists($this->endpoints, $this->randomMachineName()), 'Relation with invalid relation type not found.');
+    $this->assertEqual([], relation_relation_exists($this->endpoints, $this->randomMachineName()), 'Relation with invalid relation type not found.');
 
   }
 
@@ -81,17 +72,17 @@ class RelationAPITest extends RelationTestBase {
    * Creates some nodes, add some relations and checks if they are related.
    */
   public function testRelationQuery() {
-    $relations = entity_load_multiple('relation', array_keys(relation_query('node', $this->node1->id())->execute()));
+    $relations = $this->container->get('entity_type.manager')->getStorage('relation')->loadMultiple(array_keys(relation_query('node', $this->node1->id())->execute()));
 
     // Check that symmetric relation is correctly related to node 4.
     $this->assertEqual($relations[$this->rid_symmetric]->endpoints[1]->entity_id, $this->node4->id(), 'Correct entity is related: ' . $relations[$this->rid_symmetric]->endpoints[1]->entity_id . '==' . $this->node4->id());
 
     // Symmetric relation is Article 1 <--> Page 4
     // @see https://drupal.org/node/1760026
-    $endpoints = array(
-      array('entity_type' => 'node', 'entity_id' => $this->node4->id()),
-      array('entity_type' => 'node', 'entity_id' => $this->node4->id()),
-    );
+    $endpoints = [
+      ['entity_type' => 'node', 'entity_id' => $this->node4->id()],
+      ['entity_type' => 'node', 'entity_id' => $this->node4->id()],
+    ];
     $exists = relation_relation_exists($endpoints, 'symmetric');
     $this->assertTrue(empty($exists), 'node4 is not related to node4.');
 
@@ -136,11 +127,11 @@ class RelationAPITest extends RelationTestBase {
 
     // Get relations for node 1 (symmetric, directional, octopus), limit to
     // directional and octopus with relation_type().
-    $relations = relation_query('node', $this->node1->id())
-      ->condition('relation_type', array(
-        $this->relation_types['directional']['relation_type'],
-        $this->relation_types['octopus']['relation_type'],
-      ))
+    $relations = relation_query('node', $this->node1->id());
+    $or_condition = $relations->orConditionGroup()
+      ->condition('relation_type', $this->relation_types['directional']['relation_type'])
+      ->condition('relation_type', $this->relation_types['octopus']['relation_type']);
+    $relations = $relations->condition($or_condition)
       ->execute();
     $count = count($relations);
     $this->assertEqual($count, 2);
@@ -163,11 +154,11 @@ class RelationAPITest extends RelationTestBase {
     $relations = relation_query('node', $this->node1->id())
       ->sort('created', 'DESC')
       ->execute();
-    $this->assertEqual($relations, array(
+    $this->assertEqual($relations, [
       $this->rid_octopus => $this->rid_octopus,
       $this->rid_directional => $this->rid_directional,
       $this->rid_symmetric => $this->rid_symmetric,
-    ));
+    ]);
 
     // Create 10 more symmetric relations and verify that the count works with
     // double digit counts as well.
@@ -227,7 +218,7 @@ class RelationAPITest extends RelationTestBase {
       $count = count($relation->endpoints);
       $this->assertEqual($count, count($endpoints));
       $this->assertEqual($relation->arity->value, count($endpoints));
-      $this->assertEqual($relation->relation_type->value, $relation_type);
+      $this->assertEqual($relation->bundle(), $relation_type);
       foreach ($relation->endpoints as $endpoint) {
         $need_ids[$endpoint->entity_id] = TRUE;
       }
@@ -254,19 +245,18 @@ class RelationAPITest extends RelationTestBase {
     // Invalid relations are deleted when any endpoint entity is deleted.
     // Octopus relation is valid with 3 endpoints, currently it has 4.
     $this->node1->delete();
-    $this->assertTrue(entity_load('relation', $this->rid_octopus), 'Relation is not deleted.');
+    $this->assertTrue($this->container->get('entity_type.manager')->getStorage('relation')->load($this->rid_octopus), 'Relation is not deleted.');
     $this->node2->delete();
-    $this->assertFalse(entity_load('relation', $this->rid_octopus), 'Relation is deleted.');
+    $this->assertFalse($this->container->get('entity_type.manager')->getStorage('relation')->load($this->rid_octopus), 'Relation is deleted.');
   }
 
   /**
    * Tests relation revisions.
-   *
-   * @TODO
    */
-  public function todoTestRelationRevision() {
-    $first_user = $this->drupalCreateUser(array('edit relations'));
-    $second_user = $this->drupalCreateUser(array('edit relations'));
+  public function testRelationRevision() {
+    /* todo Uncomment when revisions are fixed.
+    $first_user = $this->drupalCreateUser(['edit relations']);
+    $second_user = $this->drupalCreateUser(['edit relations']);
 
     $this->drupalLogin($first_user);
     $relation = relation_insert($this->relation_type_octopus, $this->endpoints_4);
@@ -277,14 +267,15 @@ class RelationAPITest extends RelationTestBase {
 
     // Relation should still be owned by the first user.
     $this->drupalLogin($second_user);
-    $relation = entity_load('relation', $rid);
+    $relation = $this->container->get('entity_type.manager')->getStorage('relation')->load($rid);
     $relation->save();
     $this->assertEqual($relation->id(), $first_user->id(), 'Relation uid did not get changed to a user different to original.');
 
     // Relation revision authors should not be identical though.
-    $first_revision = entity_revision_load('relation', $vid);
-    $second_revision = entity_revision_load('relation', $relation->vid);
+    $first_revision = $this->container->get('entity_type.manager')->getStorage('relation')->loadRevision($vid);
+    $second_revision = $this->container->get('entity_type.manager')->getStorage('relation')->loadRevision($relation->vid);
     $this->assertNotIdentical($first_revision->revision_uid, $second_revision->revision_uid, 'Each revision has a distinct user.');
+    */
   }
 
 }

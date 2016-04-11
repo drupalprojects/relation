@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\relation_dummy_field\Tests\RelationDummyFieldTest.
- */
-
 namespace Drupal\relation_dummy_field\Tests;
 
 use Drupal\relation\Tests\RelationTestBase;
@@ -18,8 +13,6 @@ use Drupal\relation\Tests\RelationTestBase;
  */
 class RelationDummyFieldTest extends RelationTestBase {
 
-  public static $modules = array('relation_dummy_field');
-
   /**
    * {@inheritdoc}
    */
@@ -30,10 +23,9 @@ class RelationDummyFieldTest extends RelationTestBase {
   /**
    * Create a relation field on the Article node type, and check if it displays
    * the relations correctly on the node page.
-   *
-   * @TODO
    */
-  function todoTestDummyFieldDisplayed() {
+  function testDummyFieldDisplayed() {
+    /* todo Uncomment and fix when relation field is created.
     $this->drupalGet('node/' . $this->node1->nid);
     $this->assertNoRaw($this->node4->title, 'Node 4 title is not found');
     $this->field_name = drupal_strtolower($this->randomMachineName()) . '_field_name';
@@ -65,6 +57,7 @@ class RelationDummyFieldTest extends RelationTestBase {
     // As we have asserted Node 4 title not being on the page the only way this
     // click can succeed if the field formatter put it there.
     $this->clickLink($this->node4->title);
+    */
   }
 
 }

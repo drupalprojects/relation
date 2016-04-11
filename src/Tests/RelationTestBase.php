@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\relation\Tests\RelationTestBase.
- */
-
 namespace Drupal\relation\Tests;
 
 use Drupal\simpletest\WebTestBase;
@@ -18,14 +13,15 @@ abstract class RelationTestBase extends WebTestBase {
   /**
    * Load all dependencies since d.o testbot is fussy.
    */
-  public static $modules = array(
+  public static $modules = [
+    'node',
     'relation',
     'relation_endpoint',
     'field',
     'field_ui',
     'block',
     'relation_dummy_field',
-  );
+  ];
 
   protected $sleep = FALSE;
 
@@ -36,8 +32,8 @@ abstract class RelationTestBase extends WebTestBase {
     parent::setUp();
     // Create Basic page and Article node types.
     if ($this->profile != 'standard') {
-      $this->drupalCreateContentType(array('type' => 'page', 'name' => 'Basic page'));
-      $this->drupalCreateContentType(array('type' => 'article', 'name' => 'Article'));
+      $this->drupalCreateContentType(['type' => 'page', 'name' => 'Basic page']);
+      $this->drupalCreateContentType(['type' => 'article', 'name' => 'Article']);
     }
 
     // Defines entities.
@@ -61,34 +57,34 @@ abstract class RelationTestBase extends WebTestBase {
    * Creates nodes.
    */
   protected function createRelationNodes() {
-    $this->node1 = $this->drupalCreateNode(array(
+    $this->node1 = $this->drupalCreateNode([
       'type' => 'article',
       'promote' => 1,
       'title' => 'Grandparent',
-    ));
-    $this->node2 = $this->drupalCreateNode(array(
+    ]);
+    $this->node2 = $this->drupalCreateNode([
       'type' => 'article',
       'promote' => 0,
-    ));
-    $this->node3 = $this->drupalCreateNode(array(
+    ]);
+    $this->node3 = $this->drupalCreateNode([
       'type' => 'page',
       'promote' => 1,
       'title' => 'Parent',
-    ));
-    $this->node4 = $this->drupalCreateNode(array(
+    ]);
+    $this->node4 = $this->drupalCreateNode([
       'type' => 'page',
       'promote' => 0,
       'title' => 'Child',
-    ));
-    $this->node5 = $this->drupalCreateNode(array(
+    ]);
+    $this->node5 = $this->drupalCreateNode([
       'type' => 'page',
       'promote' => 0,
-    ));
-    $this->node6 = $this->drupalCreateNode(array(
+    ]);
+    $this->node6 = $this->drupalCreateNode([
       'type' => 'page',
       'promote' => 0,
       'title' => 'Unrelated',
-    ));
+    ]);
   }
 
   /**
@@ -102,78 +98,78 @@ abstract class RelationTestBase extends WebTestBase {
    * Creates end points.
    */
   protected function createRelationEndPoints() {
-    $this->endpoints = array(
-      array('entity_type' => 'node', 'entity_id' => $this->node1->id()),
-      array('entity_type' => 'node', 'entity_id' => $this->node4->id()),
-    );
-    $this->endpoints_4 = array(
-      array('entity_type' => 'node', 'entity_id' => $this->node1->id()),
-      array('entity_type' => 'node', 'entity_id' => $this->node2->id()),
-      array('entity_type' => 'node', 'entity_id' => $this->node3->id()),
-      array('entity_type' => 'node', 'entity_id' => $this->node4->id()),
-    );
-    $this->endpoints_entitysame = array(
-      array('entity_type' => 'node', 'entity_id' => $this->node3->id()),
-      array('entity_type' => 'node', 'entity_id' => $this->node4->id()),
-    );
-    $this->endpoints_entitydifferent = array(
-      array('entity_type' => 'user', 'entity_id' => $this->user1->id()),
-      array('entity_type' => 'node', 'entity_id' => $this->node3->id()),
-    );
-    $this->endpoints_unary = array(
-      array('entity_type' => 'node', 'entity_id' => $this->node5->id()),
-    );
+    $this->endpoints = [
+      ['entity_type' => 'node', 'entity_id' => $this->node1->id()],
+      ['entity_type' => 'node', 'entity_id' => $this->node4->id()],
+    ];
+    $this->endpoints_4 = [
+      ['entity_type' => 'node', 'entity_id' => $this->node1->id()],
+      ['entity_type' => 'node', 'entity_id' => $this->node2->id()],
+      ['entity_type' => 'node', 'entity_id' => $this->node3->id()],
+      ['entity_type' => 'node', 'entity_id' => $this->node4->id()],
+    ];
+    $this->endpoints_entitysame = [
+      ['entity_type' => 'node', 'entity_id' => $this->node3->id()],
+      ['entity_type' => 'node', 'entity_id' => $this->node4->id()],
+    ];
+    $this->endpoints_entitydifferent = [
+      ['entity_type' => 'user', 'entity_id' => $this->user1->id()],
+      ['entity_type' => 'node', 'entity_id' => $this->node3->id()],
+    ];
+    $this->endpoints_unary = [
+      ['entity_type' => 'node', 'entity_id' => $this->node5->id()],
+    ];
   }
 
   /**
    * Creates a set of standard relation types.
    */
   protected function createRelationTypes() {
-    $this->relation_types['symmetric'] = array(
+    $this->relation_types['symmetric'] = [
       'relation_type' => 'symmetric',
       'label' => 'symmetric',
-      'source_bundles' => array(
+      'source_bundles' => [
         'node:article',
         'node:page',
         'taxonomy_term:*',
         'user:*',
-      ),
-    );
-    $this->relation_types['directional'] = array(
+      ],
+    ];
+    $this->relation_types['directional'] = [
       'relation_type' => 'directional',
       'label' => 'directional',
       'directional' => TRUE,
-      'source_bundles' => array('node:*'),
-      'target_bundles' => array('node:page'),
-    );
-    $this->relation_types['directional_entitysame'] = array(
+      'source_bundles' => ['node:*'],
+      'target_bundles' => ['node:page'],
+    ];
+    $this->relation_types['directional_entitysame'] = [
       'relation_type' => 'directional_entitysame',
       'label' => 'directional_entitysame',
       'directional' => TRUE,
-      'source_bundles' => array('node:page'),
-      'target_bundles' => array('node:page'),
-    );
-    $this->relation_types['directional_entitydifferent'] = array(
+      'source_bundles' => ['node:page'],
+      'target_bundles' => ['node:page'],
+    ];
+    $this->relation_types['directional_entitydifferent'] = [
       'relation_type' => 'directional_entitydifferent',
       'label' => 'directional_entitydifferent',
       'directional' => TRUE,
-      'source_bundles' => array('user:*'),
-      'target_bundles' => array('node:page'),
-    );
-    $this->relation_types['octopus'] = array(
+      'source_bundles' => ['user:*'],
+      'target_bundles' => ['node:page'],
+    ];
+    $this->relation_types['octopus'] = [
       'relation_type' => 'octopus',
       'label' => 'octopus',
       'min_arity' => 3,
       'max_arity' => 5,
-      'source_bundles' => array('node:article', 'node:page'),
-    );
-    $this->relation_types['unary'] = array(
+      'source_bundles' => ['node:article', 'node:page'],
+    ];
+    $this->relation_types['unary'] = [
       'relation_type' => 'unary',
       'label' => 'unary',
       'min_arity' => 1,
       'max_arity' => 1,
-      'source_bundles' => array('node:page'),
-    );
+      'source_bundles' => ['node:page'],
+    ];
     foreach ($this->relation_types as $values) {
       $relation_type = RelationType::create($values);
       $relation_type->save();
@@ -252,6 +248,8 @@ abstract class RelationTestBase extends WebTestBase {
    *   Machine name of the relation type.
    * @param array $endpoints
    *   An array containing the endpoints.
+   *
+   * @return string|int|null
    */
   protected function saveRelation($relation_type, array $endpoints) {
     $relation = relation_insert($relation_type, $endpoints);
