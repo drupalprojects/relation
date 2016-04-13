@@ -2,6 +2,8 @@
 
 namespace Drupal\relation\Tests;
 
+use Drupal\relation\Entity\Relation;
+
 /**
  * Test general API for Relation.
  *
@@ -213,7 +215,9 @@ class RelationAPITest extends RelationTestBase {
       if ($relation_type == 'directional_entitydifferent') {
         $endpoints = $this->endpoints_entitydifferent;
       }
-      $relation = relation_insert($relation_type, $endpoints);
+      $relation = Relation::create(array('relation_type' => $relation_type));
+      $relation->endpoints = $endpoints;
+      $relation->save();
       $this->assertTrue($relation->id(), 'Relation created.');
       $count = count($relation->endpoints);
       $this->assertEqual($count, count($endpoints));
@@ -259,7 +263,8 @@ class RelationAPITest extends RelationTestBase {
     $second_user = $this->drupalCreateUser(['edit relations']);
 
     $this->drupalLogin($first_user);
-    $relation = relation_insert($this->relation_type_octopus, $this->endpoints_4);
+    $relation = Relation::create(array('relation_type' => $this->relation_type_octopus));
+    $relation->endpoints = $this->endpoints_4;
     $relation->save();
     $rid = $relation->id();
     $this->assertEqual($relation->id(), $first_user->id(), 'Relation uid set to logged in user.');

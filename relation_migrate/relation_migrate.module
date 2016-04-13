@@ -4,6 +4,7 @@
  * @file
  * Migrations between *reference fields and relations.
  */
+use Drupal\relation\Entity\RelationType;
 
 /**
  * Implements hook_menu().
@@ -101,7 +102,7 @@ function _relation_migrate_validate_type($element, &$form_state, $form) {
   if (!empty($form_state['input']['relation_migrate_' . $element['#array_parents'][0] . '_relation_type'])) {
     module_load_include('inc', 'relation_migrate', 'relation_migrate.modules');
     $field_type = field_info_field_types($element['#array_parents'][0]);
-    $relation_type = relation_type_load($form_state['input']['relation_migrate_' . $element['#array_parents'][0] . '_relation_type']);
+    $relation_type = RelationType::load($form_state['input']['relation_migrate_' . $element['#array_parents'][0] . '_relation_type']);
 
     $function = $field_type['module'] . '_relation_migrate_type_target_validate';
     if (function_exists($function)) {

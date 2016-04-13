@@ -6,6 +6,7 @@
  */
 
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\relation\Entity\RelationType;
 
 /**
  * Implements hook_field_validate().
@@ -15,7 +16,7 @@ function relation_endpoint_field_validate(EntityInterface $entity, $field, $inst
     return;
   }
 
-  $relation_type = relation_type_load($entity->relation_type);
+  $relation_type = RelationType::load($entity->relation_type);
   // Check that relation_type exists.
   if (!$relation_type) {
     $errors[$field['field_name']][$langcode][$delta][] = array(

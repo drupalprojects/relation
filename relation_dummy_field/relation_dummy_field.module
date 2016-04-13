@@ -6,6 +6,7 @@
  */
 
 use Drupal\Core\Language\Language;
+use Drupal\relation\Entity\RelationType;
 
 /**
  * Implements hook_field_info().
@@ -157,7 +158,7 @@ function relation_dummy_field_field_formatter_view($entity_type, $entity, $field
       foreach ($items as $delta => $item) {
         list($id, $vid, $bundle) = entity_extract_ids($entity_type, $entity);
         $relation = (object) $item;
-        $relation_type = relation_type_load($relation->relation_type);
+        $relation_type = RelationType::load($relation->relation_type);
 
         $subject = entity_label($entity_type, $entity) . ' '; // Subject of the sentence.
         $subject_is_source = ($relation->endpoints[Language::LANGCODE_NOT_SPECIFIED]['0']['entity_id']) == $id ? TRUE : FALSE;

@@ -7,19 +7,13 @@
 
 use Drupal\Core\Language\Language;
 use Drupal\Core\Render\Element;
+use Drupal\relation\Entity\Relation;
 
 /**
  * Implements hook_rules_event_info().
  */
 function relation_rules_event_info() {
   return array(
-    'relation_insert' => array(
-      'label' => t('After saving a new relation'),
-      'group' => t('Relation'),
-      'variables' => array(
-        'relation' => array('type' => 'relation', 'label' => t('relation'), 'description' => t('The relation.')),
-      ),
-    ),
     'relation_update' => array(
       'label' => t('After updating a relation'),
       'group' => t('Relation'),
@@ -189,7 +183,7 @@ function relation_rules_get_related_entities($entity, array $options, $name, $ty
   if (!$rids) {
     return $entities_ids;
   }
-  foreach (relation_load_multiple($rids) as $relation) {
+  foreach (Relation::loadMultiple($rids) as $relation) {
     foreach ($relation->endpoints[Language::LANGCODE_NOT_SPECIFIED] as $endpoint) {
       if ($endpoint['entity_type'] == $info['target_type']) {
         $entities_ids[] = $endpoint['entity_id'];
@@ -423,7 +417,7 @@ function relation_rules_fetch_endpoint_form_alter(&$form, &$form_state, $options
  */
 function relation_rules_fetch_endpoint($relation, $entity_type, $number = 1) {
   // Make sure we have the fully loaded relation entity.
-  $loaded_relation = relation_load($relation->rid);
+  $loaded_relation = Relation::load($relation->rid);
   // Load the endpoints.
   $endpoints = field_get_items($loaded_relation, 'endpoints');
 

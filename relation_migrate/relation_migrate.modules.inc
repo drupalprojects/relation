@@ -5,13 +5,14 @@
  * @files
  * Hook implementations in behalf of core and supported contrib modules.
  */
+use Drupal\relation\Entity\RelationType;
 
 /**
  * Implements hook_relation_migrate_type_target_validate().
  */
 function taxonomy_relation_migrate_type_target_validate($element, $form_state, $form) {
   $fields = array_filter($form_state['input']['relation_migrate_taxonomy_term_reference_fields']);
-  $relation_type = relation_type_load($form_state['input']['relation_migrate_taxonomy_term_reference_relation_type']);
+  $relation_type = RelationType::load($form_state['input']['relation_migrate_taxonomy_term_reference_relation_type']);
   $supported_bundles = $relation_type->directional ? $relation_type->target_bundles : $relation_type->source_bundles;
 
   $return = TRUE;
@@ -32,7 +33,7 @@ function user_reference_relation_migrate_type_target_validate($element, $form_st
     return TRUE;
   }
 
-  $relation_type = relation_type_load($form_state['input']['relation_migrate_user_reference_relation_type']);
+  $relation_type = RelationType::load($form_state['input']['relation_migrate_user_reference_relation_type']);
   $supported_bundles = $relation_type->directional ? $relation_type->target_bundles : $relation_type->source_bundles;
   foreach ($supported_bundles as $bundle) {
     if (strpos($bundle, 'user:') !== FALSE) {
@@ -48,7 +49,7 @@ function user_reference_relation_migrate_type_target_validate($element, $form_st
  */
 function node_reference_relation_migrate_type_target_validate($element, $form_state, $form) {
   $fields = array_filter($form_state['input']['relation_migrate_node_reference_fields']);
-  $relation_type = relation_type_load($form_state['input']['relation_migrate_node_reference_relation_type']);
+  $relation_type = RelationType::load($form_state['input']['relation_migrate_node_reference_relation_type']);
   $supported_bundles = $relation_type->directional ? $relation_type->target_bundles : $relation_type->source_bundles;
 
   $return = TRUE;
@@ -68,7 +69,7 @@ function node_reference_relation_migrate_type_target_validate($element, $form_st
  */
 function entityreference_relation_migrate_type_target_validate($element, $form_state, $form) {
   $fields = array_filter($form_state['input']['relation_migrate_entityreference_fields']);
-  $relation_type = relation_type_load($form_state['input']['relation_migrate_entityreference_relation_type']);
+  $relation_type = RelationType::load($form_state['input']['relation_migrate_entityreference_relation_type']);
   $supported_bundles = $relation_type->directional ? $relation_type->target_bundles : $relation_type->source_bundles;
 
   $return = TRUE;

@@ -4,6 +4,7 @@
  * @file
  * Support for relation destinations.
  */
+use Drupal\relation\Entity\Relation;
 
 /**
  * Destination class implementing migration into relation.
@@ -108,7 +109,7 @@ class MigrateDestinationRelation extends MigrateDestinationEntity {
       if (!isset($relation->rid)) {
         throw new MigrateException(t('System-of-record is DESTINATION, but no destination rid provided'));
       }
-      $old_relation = relation_load($relation->rid);
+      $old_relation = Relation::load($relation->rid);
       if (!isset($relation->created)) {
         $relation->created = $old_relation->created;
       }

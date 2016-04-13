@@ -10,6 +10,7 @@ namespace Drupal\relation_entity_collector\Form;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
+use Drupal\relation\Entity\RelationType;
 
 /**
  * Provides a entity collector form.
@@ -51,7 +52,7 @@ class EntityCollector extends FormBase {
         foreach ($entities as $entity_id => $entity) {
           $entity_bundle = $entity->bundle();
           if ($relation_type) {
-            $relation_type_object = relation_type_load($relation_type);
+            $relation_type_object = RelationType::load($relation_type);
             $valid = FALSE;
             foreach (array('source_bundles', 'target_bundles') as $property) {
               foreach ($relation_type_object->$property as $allowed_bundle) {
@@ -141,7 +142,7 @@ class EntityCollector extends FormBase {
         $form['reload']['table']['#theme'] = 'relation_entity_collector_table';
       }
       if (!isset($relation_type_object) && !empty($relation_type)) {
-        $relation_type_object = relation_type_load($relation_type);
+        $relation_type_object = RelationType::load($relation_type);
       }
       $min_arity = isset($relation_type_object->min_arity) ? $relation_type_object->min_arity : 1;
       if (count($_SESSION['relation_entity_keys']) >= $min_arity) {

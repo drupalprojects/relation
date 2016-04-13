@@ -4,6 +4,7 @@
  * @file
  * Drush integration for the relation module.
  */
+use Drupal\relation\Entity\Relation;
 
 /**
  * Implements hook_drush_command().
@@ -116,7 +117,9 @@ function relation_generate_relations($number_relations = 10, $relation_types = a
           );
         }
       }
-      $relation = relation_insert($relation_type->id(), $endpoints);
+      $relation = Relation::create(array('relation_type' => $relation_type->id()));
+      $relation->endpoints = $endpoints;
+      $relation->save();
       $new_rids[] = $relation->id();
       relation_generate_message(
         \Drupal::translation()->formatPlural(

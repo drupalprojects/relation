@@ -55,7 +55,7 @@ class RelationTypeForm extends EntityForm {
       '#disabled' => $relation_type->relation_type,
       '#machine_name' => array(
         'source' => array('labels', 'name'),
-        'exists' => 'relation_type_load',
+        'exists' => '\Drupal\relation\Entity\RelationType::load',
       ),
     );
     $form['labels']['reverse_label'] = array(

@@ -2,6 +2,7 @@
 
 namespace Drupal\relation\Tests;
 
+use Drupal\relation\Entity\Relation;
 use Drupal\simpletest\WebTestBase;
 use Drupal\relation\Entity\RelationType;
 
@@ -252,7 +253,9 @@ abstract class RelationTestBase extends WebTestBase {
    * @return string|int|null
    */
   protected function saveRelation($relation_type, array $endpoints) {
-    $relation = relation_insert($relation_type, $endpoints);
+    $relation = Relation::create(array('relation_type' => $relation_type));
+    $relation->endpoints = $endpoints;
+    $relation->save();
     if ($this->sleep) {
       sleep(1);
     }

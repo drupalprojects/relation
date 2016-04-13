@@ -36,7 +36,6 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *   },
  *   base_table = "relation",
  *   revision_table = "relation_revision",
- *   uri_callback = "relation_uri",
  *   field_ui_base_route = "entity.relation_type.edit_form",
  *   entity_keys = {
  *     "id" = "rid",
@@ -157,7 +156,7 @@ class Relation extends ContentEntityBase implements RelationInterface {
    * {@inheritdoc}
    */
   public function relation_type_label($reverse = FALSE) {
-    $relation_type = relation_type_load($this->bundle());
+    $relation_type = RelationType::load($this->bundle());
     if ($relation_type) {
       return ($relation_type->directional && $reverse) ? $relation_type->reverse_label : $relation_type->label;
     }
