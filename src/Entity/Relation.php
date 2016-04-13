@@ -7,6 +7,7 @@
 
 namespace Drupal\relation\Entity;
 
+use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Language\Language;
@@ -58,6 +59,9 @@ use Drupal\Core\Field\BaseFieldDefinition;
  * )
  */
 class Relation extends ContentEntityBase implements RelationInterface {
+
+  use EntityChangedTrait;
+
   /**
    * {@inheritdoc}
    */
