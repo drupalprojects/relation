@@ -68,7 +68,7 @@ class RelationRulesTest extends RelationTestBase {
 
       // There is no way for the rule to return the created relation. So get the
       // last inserted id, which should be the relation we are looking for.
-      $rid = db_query('SELECT MAX(rid) FROM {relation}')->fetchField();
+      $rid = \Drupal::database()->query('SELECT MAX(rid) FROM {relation}')->fetchField();
       // If all went well, we should now have a relation with correct endpoints.
       $relation = Relation::load($rid);
       $correct = ($relation->endpoints[Language::LANGCODE_NOT_SPECIFIED][0]['entity_id'] == $node->nid) && ($relation->endpoints[Language::LANGCODE_NOT_SPECIFIED][1]['entity_id'] == $user->uid);
@@ -93,8 +93,10 @@ class RelationRulesTest extends RelationTestBase {
 
       // There is no way for the rule to return the created relation. So get the
       // last inserted id, which should be the relation we are looking for.
-      $rid = db_query('SELECT MAX(rid) FROM {relation}')->fetchField();
-      $relation = Relation::load($rid);
+
+      $rid = \Drupal::database()->query('SELECT MAX(rid) FROM {relation}')->fetchField();
+      $relation = relation_load($rid);
+
       // The $node and the $user should be the the same as in the last test,
       // since we fetched the endpoits from that relation.
       $correct = ($relation->endpoints[Language::LANGCODE_NOT_SPECIFIED][0]['entity_id'] == $node->nid) && ($relation->endpoints[Language::LANGCODE_NOT_SPECIFIED][1]['entity_id'] == $user->uid);
@@ -148,14 +150,14 @@ class RelationRulesTest extends RelationTestBase {
         $property = "node$i";
         $node = $this->$property;
         if ($node->nid == $nid) {
-          $this->assertFalse((bool) db_query_range('SELECT * FROM {node} WHERE nid = :nid', 0, 1, array(':nid' => $nid))->fetchField(), t('The correct node was deleted'));
+          $this->assertFalse((bool) \Drupal::database()->queryRange('SELECT * FROM {node} WHERE nid = :nid', 0, 1, array(':nid' => $nid))->fetchField(), t('The correct node was deleted'));
         }
         else {
           $nids[] = $node->nid;
         }
       }
       $count = count($nids);
-      $this->assertEqual($count, db_query('SELECT COUNT(*) FROM {node} WHERE nid IN (:nids)', array(':nids' => $nids))->fetchField(), t('@count other nodes were found', array('@count' => $count)));
+      $this->assertEqual($count, \Drupal::database()->query('SELECT COUNT(*) FROM {node} WHERE nid IN (:nids)', array(':nids' => $nids))->fetchField(), t('@count other nodes were found', array('@count' => $count)));
     }
     */
   }

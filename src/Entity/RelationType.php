@@ -187,7 +187,7 @@ class RelationType extends ConfigEntityBundleBase implements RelationTypeInterfa
     else {
       // Clear the cached field definitions as some settings affect the field
       // definitions.
-      $this->entityManager()->clearCachedFieldDefinitions();
+      \Drupal::service('entity_field.manager')->clearCachedFieldDefinitions();
     }
   }
 

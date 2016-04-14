@@ -8,6 +8,7 @@
 use Drupal\Core\Language\Language;
 use Drupal\Core\Render\Element;
 use Drupal\relation\Entity\Relation;
+use Drupal\relation\Entity\RelationType;
 
 /**
  * Implements hook_rules_event_info().
@@ -127,7 +128,8 @@ function relation_rules_get_specific_endpoints($relation, array $options, $prope
 
   $array = array();
   foreach ($endpoints as $endpoint) {
-    $entity = entity_load($endpoint['entity_type'], $endpoint['entity_id']);
+    $storage_handler = \Drupal::entityTypeManager()->getStorage($endpoint['entity_type']);
+    $entity = $storage_handler->load($endpoint['entity_id']);
     $array[] = $entity->id();
   }
   return $array;
@@ -295,7 +297,7 @@ function relation_rules_fetch_endpoint_type_options(RulesAbstractPlugin $element
     }
   }
 
-  foreach (entity_load_multiple('relation_type') as $relation_type) {
+  foreach (RelationType::loadMultiple() as $relation_type) {
     // Add the allowed source entity types to the list.
     if (!empty($relation_type->source_bundles)) {
       foreach ($relation_type->source_bundles as $source_bundle) {
@@ -432,7 +434,8 @@ function relation_rules_fetch_endpoint($relation, $entity_type, $number = 1) {
     }
   }
   if ($entity_ids) {
-    $return = entity_load($entity_type, $entity_ids);
+    $storage_handler = \Drupal::entityTypeManager()->getStorage($entity_type);
+    $return = $storage_handler->loadMultiple($entity_ids);
     // Return a list unless we are only supposed to return a single entity.
     if (1 == $number) {
       $return = reset($return);

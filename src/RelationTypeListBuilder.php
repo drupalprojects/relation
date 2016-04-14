@@ -9,6 +9,7 @@ namespace Drupal\relation;
 
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Url;
 
 /**
  * Provides a listing of relation types.
@@ -39,7 +40,7 @@ class RelationTypeListBuilder extends ConfigEntityListBuilder {
   public function render() {
     $build = parent::render();
     $build['#empty'] = t('No relation types exist. <a href="@link">Add relation type</a>.', array(
-      '@link' => \Drupal::url('entity.relation_type.add_form'),
+      '@link' => Url::fromRoute('entity.relation_type.add_form'),
     ));
     return $build;
   }

@@ -1,7 +1,9 @@
 <?php
 
 namespace Drupal\relation\Tests;
+
 use Drupal\Core\Database\Database;
+use Drupal\relation\Entity\Relation;
 
 /**
  * Relation UI.
@@ -38,7 +40,7 @@ class RelationUITest extends RelationTestBase {
    * Tests deletion of a relation.
    */
   public function testRelationDelete() {
-    $relation = $this->container->get('entity_type.manager')->getStorage('relation')->load($this->rid_directional);;
+    $relation = Relation::load($this->rid_directional);
 
     $this->drupalPostForm("relation/" . $relation->id() . "/delete", array(), t('Delete'));
     $arg = [':rid' => $relation->id()];

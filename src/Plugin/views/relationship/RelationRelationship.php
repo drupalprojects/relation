@@ -72,7 +72,7 @@ class RelationRelationship extends RelationshipStandard {
    *
    */
   public function query() {
-    $table_mapping = \Drupal::entityManager()->getStorage('relation')->getTableMapping();
+    $table_mapping = \Drupal::entityTypeManager()->getStorage('relation')->getTableMapping();
     $endpoints_field = FieldStorageConfig::loadByName('relation', 'endpoints');
 
     $relation_data_table_name = $table_mapping->getDedicatedDataTableName($endpoints_field);

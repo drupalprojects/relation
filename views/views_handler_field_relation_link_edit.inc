@@ -23,7 +23,7 @@ class views_handler_field_relation_link_edit extends views_handler_field_relatio
 
     $this->options['alter']['make_link'] = TRUE;
     $this->options['alter']['path'] = "relation/$relation->rid/edit";
-    $this->options['alter']['query'] = drupal_get_destination();
+    $this->options['alter']['query'] = \Drupal::destination()->getAsArray();
 
     $text = !empty($this->options['text']) ? $this->options['text'] : t('Edit');
     return $text;

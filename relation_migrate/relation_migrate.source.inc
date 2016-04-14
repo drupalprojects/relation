@@ -72,7 +72,7 @@ abstract class MigrateSourceReference extends MigrateSource {
   public function computeCount() {
     $rows_count = 0;
     foreach ($this->fields as $field_name) {
-      $rows_count += db_query('SELECT count(*) FROM {field_data_' . $field_name . '} WHERE deleted = 0')->fetchField();
+      $rows_count += \Drupal::database()->query('SELECT count(*) FROM {field_data_' . $field_name . '} WHERE deleted = 0')->fetchField();
     }
     return $rows_count;
   }
@@ -90,7 +90,7 @@ abstract class MigrateSourceReference extends MigrateSource {
       $columns = array_keys($field_info['columns']);
 
       if (!empty($field_info) && $field_info['type'] == $this->field_type) {
-        $field_data = db_select('field_data_' . $field_name, 'f')->fields('f', array('entity_type', 'entity_id', 'delta', $field_name . '_' . $columns[0]))->condition('deleted', 0);
+        $field_data = \Drupal::database()->select('field_data_' . $field_name, 'f')->fields('f', array('entity_type', 'entity_id', 'delta', $field_name . '_' . $columns[0]))->condition('deleted', 0);
         $field_data->addExpression(":name", 'field_name', array(':name' => $field_name));
         $field_data = $field_data->execute()->fetchAll();
 

@@ -28,6 +28,8 @@ use Drupal\Core\Render\Element;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\relation\Entity\Relation;
 use Drupal\relation\Entity\RelationType;
+use Drupal\Core\Entity\Entity\EntityFormDisplay;
+use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\relation\RelationTypeInterface;
 use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\Core\Field\FieldItemListInterface;
@@ -268,7 +270,7 @@ function relation_get_related_entity($entity_type, $entity_id, $relation_type = 
     $relation_id = reset($results);
 
     if ($relation_id) {
-      $relation = entity_load('relation', $relation_id);
+      $relation = Relation::load($relation_id);
       if ($relation->arity->value == 1) {
         $entities = FALSE;
       }
@@ -290,9 +292,11 @@ function relation_get_related_entity($entity_type, $entity_id, $relation_type = 
       $first_entity_key = $first_entity_key . ':' . $entities[0]->r_index;
     }
     if ($request_key == $first_entity_key) {
-      return entity_load($entities[1]->entity_type, $entities[1]->entity_id);
+      $storage_handler = \Drupal::entityTypeManager()->getStorage($entities[1]->entity_type);
+      return $storage_handler->load($entities[1]->entity_id);
     }
-    return entity_load($entities[0]->entity_type, $entities[0]->entity_id);
+    $storage_handler = \Drupal::entityTypeManager()->getStorage($entities[0]->entity_type);
+    return $storage_handler->load($entities[0]->entity_id);
   }
 
   return FALSE;
@@ -370,7 +374,9 @@ function relation_entity_delete(EntityInterface $entity) {
     }
   }
   if (!empty($relations_to_delete)) {
-    entity_delete_multiple('relation', $relations_to_delete);
+    $storage_handler = \Drupal::entityTypeManager()->getStorage('relation');
+    $relations = $storage_handler->loadMultiple($relations_to_delete);
+    $storage_handler->delete($relations);
     \Drupal::logger('relation')->error('Relations @relations have been deleted.', array('@relations' => implode(', ', $relations_to_delete)));
   }
 }
@@ -404,18 +410,32 @@ function relation_add_endpoint_field(RelationTypeInterface $relation_type) {
     $instance->save();
 
     // Widget settings.
-    entity_get_form_display('relation', $relation_type->id(), 'default')
-      ->setComponent(RELATION_FIELD_NAME, array(
-        'type' => 'relation_endpoint',
-      ))
-      ->save();
+    $entity_form_display = \Drupal::entityTypeManager()->getStorage('entity_form_display')->load('relation.' . $relation_type->id() . '.default');
+    if (!$entity_form_display) {
+      $entity_form_display = EntityFormDisplay::create(array(
+        'targetEntityType' => 'relation',
+        'bundle' => $relation_type->id(),
+        'mode' => 'default',
+        'status' => TRUE,
+      ));
+    }
+    $entity_form_display->setComponent(RELATION_FIELD_NAME, array(
+      'type' => 'relation_endpoint',
+    ))->save();
 
     // Display settings.
-    entity_get_display('relation', $relation_type->id(), 'default')
-      ->setComponent(RELATION_FIELD_NAME, array(
-        'label' => 'hidden',
-        'type' => 'relation_endpoint',
-      ))
-      ->save();
+    $display = \Drupal::entityTypeManager()->getStorage('entity_view_display')->load('relation.' . $relation_type->id() . '.default');
+    if (!$display) {
+      $display = EntityViewDisplay::create(array(
+        'targetEntityType' => 'relation',
+        'bundle' => $relation_type->id(),
+        'mode' => 'default',
+        'status' => TRUE,
+      ));
+    }
+    $display->setComponent(RELATION_FIELD_NAME, array(
+      'label' => 'hidden',
+      'type' => 'relation_endpoint',
+    ))->save();
   }
 }

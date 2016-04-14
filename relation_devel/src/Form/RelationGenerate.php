@@ -7,6 +7,7 @@
 
 namespace Drupal\relation_devel\Form;
 use Drupal\Core\Form\FormBase;
+use Drupal\relation\Entity\RelationType;
 
 /**
  * Provides a form for generating dummy relations.
@@ -23,7 +24,7 @@ class RelationGenerate extends FormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, array &$form_state) {
-    $relation_types = entity_load_multiple('relation_type');
+    $relation_types = RelationType::loadMultiple();
 
     if (empty($relation_types)) {
       $form['explanation']['#markup'] = t("You must create a relation type before you can generate relations.");

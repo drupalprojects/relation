@@ -102,7 +102,7 @@ class MigrateDestinationRelation extends MigrateDestinationEntity {
         $relation->rid = $row->migrate_map_destid1;
       }
       // Get the existing vid, so updates don't generate notices.
-      $values = db_select('relation', 'r')->fields('r', array('vid'))->condition('rid', $relation->rid)->execute()->fetchAssoc();
+      $values = \Drupal::database()->select('relation', 'r')->fields('r', array('vid'))->condition('rid', $relation->rid)->execute()->fetchAssoc();
       $relation->vid = $values['vid'];
     }
     if ($migration->getSystemOfRecord() == Migration::DESTINATION) {
@@ -180,12 +180,12 @@ class MigrateDestinationRelation extends MigrateDestinationEntity {
 
       // Update changed and created dates if needed.
       if (isset($changed)) {
-        db_update('relation')->fields(array('changed' => $changed))->condition('rid', $relation->rid)->execute();
+        \Drupal::database()->update('relation')->fields(array('changed' => $changed))->condition('rid', $relation->rid)->execute();
         $relation->changed = $changed;
       }
 
       if (isset($created)) {
-        db_update('relation')->fields(array('created' => $created))->condition('rid', $relation->rid)->execute();
+        \Drupal::database()->update('relation')->fields(array('created' => $created))->condition('rid', $relation->rid)->execute();
         $relation->created = $created;
       }
 

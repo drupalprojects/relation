@@ -131,8 +131,8 @@ class RelationTypeForm extends EntityForm {
     );
 
     $options_bundles = array();
-    $entity_info = \Drupal::entityManager()->getDefinitions();
-    foreach (entity_get_bundles() as $entity_type => $bundles) {
+    $entity_info = \Drupal::entityTypeManager()->getDefinitions();
+    foreach (\Drupal::service('entity_type.bundle.info')->getAllBundleInfo() as $entity_type => $bundles) {
       $entity_label = $entity_info[$entity_type]->getLabel();
       $entity_label_string = (string) $entity_label;
       $options_bundles[$entity_label_string]["$entity_type:*"] = 'all ' . $entity_label_string . ' bundles';

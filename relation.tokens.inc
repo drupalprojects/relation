@@ -5,6 +5,8 @@
  * Builds placeholder replacement tokens for relation data.
  */
 
+use Drupal\user\Entity\User;
+
 /**
  * Implements hook_token_info().
  */
@@ -121,24 +123,24 @@ function relation_tokens($type, $tokens, array $data = array(), array $options =
             $name = variable_get('anonymous', t('Anonymous'));
           }
           else {
-            $user = user_load($relation->uid);
+            $user = User::load($relation->uid);
             $name = $user->name;
           }
           $replacements[$original] = $sanitize ? filter_xss($name) : $name;
           break;
 
         case 'created':
-          $replacements[$original] = format_date($relation->created, 'medium', '', NULL, $language_code);
+          $replacements[$original] = \Drupal::service('date.formatter')->format($relation->created, 'medium', '', NULL, $language_code);
           break;
 
         case 'changed':
-          $replacements[$original] = format_date($relation->changed, 'medium', '', NULL, $language_code);
+          $replacements[$original] = \Drupal::service('date.formatter')->format($relation->changed, 'medium', '', NULL, $language_code);
           break;
       }
     }
 
     if ($author_tokens = token_find_with_prefix($tokens, 'author')) {
-      $author = user_load($relation->uid);
+      $author = User::load($relation->uid);
       $replacements += token_generate('user', $author_tokens, array('user' => $author), $options);
     }
 

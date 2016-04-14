@@ -6,6 +6,8 @@
  */
 use Drupal\relation\Entity\Relation;
 
+use Drupal\relation\Entity\RelationType;
+
 /**
  * Implements hook_drush_command().
  */
@@ -67,13 +69,15 @@ function relation_generate_message($message) {
  *   Array of rids of the generated relations.
  */
 function relation_generate_relations($number_relations = 10, $relation_types = array(), $kill = FALSE) {
-  $relation_types = entity_load_multiple('relation_type', $relation_types);
+  $relation_types = RelationType::loadMultiple($relation_types);
   if ($kill) {
     foreach ($relation_types as $relation_type) {
       $relation_ids = Drupal::entityQuery('relation')
         ->condition('relation_type', $relation_type->id())
         ->execute();
-      entity_delete_multiple('relation', $relation_ids);
+      $storage_handler = \Drupal::entityTypeManager()->getStorage('relation');
+      $relations = $storage_handler->loadMultiple($relation_ids);
+      $storage_handler->delete($relations);
       relation_generate_message(t('Deleted all @type relations.', array('@type' => $relation_type->label())));
     }
   }
@@ -97,8 +101,8 @@ function relation_generate_relations($number_relations = 10, $relation_types = a
       for ($r_index = 0; $r_index < $arity; $r_index++) {
         $direction = ($relation_type->directional && $r_index > 0) ? 'target' : 'source';
         $entity_type = array_rand($available_types[$direction]);
-        $entity_info = \Drupal::entityManager()->getDefinitions($entity_type);
-        $bundles = entity_get_bundles($entity_type);
+        $entity_info = \Drupal::entityTypeManager()->getDefinition($entity_type);
+        $bundles = \Drupal::service('entity_type.bundle.info')->getBundleInfo($entity_type);
         $query = Drupal::entityQuery($entity_type);
 
         if (!in_array('*', $available_types[$direction][$entity_type])) {

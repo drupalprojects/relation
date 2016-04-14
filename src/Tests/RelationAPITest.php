@@ -74,7 +74,7 @@ class RelationAPITest extends RelationTestBase {
    * Creates some nodes, add some relations and checks if they are related.
    */
   public function testRelationQuery() {
-    $relations = $this->container->get('entity_type.manager')->getStorage('relation')->loadMultiple(array_keys(relation_query('node', $this->node1->id())->execute()));
+    $relations = Relation::loadMultiple(array_keys(relation_query('node', $this->node1->id())->execute()));
 
     // Check that symmetric relation is correctly related to node 4.
     $this->assertEqual($relations[$this->rid_symmetric]->endpoints[1]->entity_id, $this->node4->id(), 'Correct entity is related: ' . $relations[$this->rid_symmetric]->endpoints[1]->entity_id . '==' . $this->node4->id());
@@ -196,7 +196,7 @@ class RelationAPITest extends RelationTestBase {
     // Delete all relations related to node 4, then confirm that these can
     // no longer be found as related entities.
     $relation_ids = relation_query('node', $this->node4->id())->execute();
-    foreach (entity_load_multiple('relation', $relation_ids) as $relation) {
+    foreach (Relation::loadMultiple($relation_ids) as $relation) {
       $relation->delete();
     }
     $this->assertFalse(relation_get_related_entity('node', $this->node4->id()), 'The entity was not loaded after the relation was deleted.');
@@ -233,7 +233,7 @@ class RelationAPITest extends RelationTestBase {
       }
       $this->assertFalse($need_ids, 'All ids found.');
       // Confirm the rid in revision table.
-      $revision = db_select('relation_revision', 'v')
+      $revision = \Drupal::database()->select('relation_revision', 'v')
           ->fields('v', array('rid'))
           ->condition('vid', $relation->vid->value)
           ->execute()
@@ -249,9 +249,9 @@ class RelationAPITest extends RelationTestBase {
     // Invalid relations are deleted when any endpoint entity is deleted.
     // Octopus relation is valid with 3 endpoints, currently it has 4.
     $this->node1->delete();
-    $this->assertTrue($this->container->get('entity_type.manager')->getStorage('relation')->load($this->rid_octopus), 'Relation is not deleted.');
+    $this->assertTrue(Relation::load($this->rid_octopus), 'Relation is not deleted.');
     $this->node2->delete();
-    $this->assertFalse($this->container->get('entity_type.manager')->getStorage('relation')->load($this->rid_octopus), 'Relation is deleted.');
+    $this->assertFalse(Relation::load($this->rid_octopus), 'Relation is deleted.');
   }
 
   /**
@@ -272,13 +272,15 @@ class RelationAPITest extends RelationTestBase {
 
     // Relation should still be owned by the first user.
     $this->drupalLogin($second_user);
+    $relation = Relation::load($rid);
     $relation = $this->container->get('entity_type.manager')->getStorage('relation')->load($rid);
     $relation->save();
     $this->assertEqual($relation->id(), $first_user->id(), 'Relation uid did not get changed to a user different to original.');
 
     // Relation revision authors should not be identical though.
-    $first_revision = $this->container->get('entity_type.manager')->getStorage('relation')->loadRevision($vid);
-    $second_revision = $this->container->get('entity_type.manager')->getStorage('relation')->loadRevision($relation->vid);
+    $storage_handler = \Drupal::entityTypeManager()->getStorage('relation');
+    $first_revision = $storage_handler->load($vid);
+    $second_revision = $storage_handler->load($relation->vid);
     $this->assertNotIdentical($first_revision->revision_uid, $second_revision->revision_uid, 'Each revision has a distinct user.');
     */
   }

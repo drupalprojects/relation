@@ -216,7 +216,7 @@ function relation_views_data() {
  * Implements hook_views_data_alter().
  */
 function relation_views_data_alter(&$data) {
-  $entity_info = Drupal::entityManager()->getDefinitions();
+  $entity_info = Drupal::entityTypeManager()->getDefinitions();
 
   // Build the relations between the different tables.
   foreach (RelationType::loadMultiple() as $relation_type) {
@@ -356,7 +356,7 @@ function relation_views_data_alter(&$data) {
  */
 function relation_form_views_ui_add_item_form_alter(&$form, $form_state) {
   if ($form_state['type'] == 'relationship' && $form_state['view']->base_table != 'relation') {
-    foreach (entity_load_multiple('relation_type') as $relation_type) {
+    foreach (RelationType::loadMultiple() as $relation_type) {
       foreach (array('source_bundles', 'target_bundles') as $endpoint_bundles) {
         foreach ($relation_type->$endpoint_bundles as $relation_bundle) {
           if (substr($relation_bundle, 0, 9) == 'relation:') {

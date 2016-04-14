@@ -65,7 +65,7 @@ class RelationEntityCollectorTest extends RelationTestBase {
     $link = l($relation_type, $path);
     // Rebuild the message using the known bundle and entity labels to make sure
     // the message contains those.
-    $bundles = entity_get_bundles('node');
+    $bundles = \Drupal::service('entity_type.bundle.info')->getBundleInfo('node');
     $node1_label = $bundles['article']['label'] . ': ' . $this->node1->label();
     $node3_label = $bundles['page']['label'] . ': ' . $this->node3->label();
     $items = array(
@@ -76,7 +76,7 @@ class RelationEntityCollectorTest extends RelationTestBase {
       '#theme' => 'item_list',
       '#items' => $items,
     );
-    $list = drupal_render($item_list);
+    $list = \Drupal::service('renderer')->render($item_list);
     $message = t('Created new !link from !list', array('!link' => $link, '!list' => $list));
     $this->assertRaw($message, 'Created a new relation.');
     $this->drupalGet($path);

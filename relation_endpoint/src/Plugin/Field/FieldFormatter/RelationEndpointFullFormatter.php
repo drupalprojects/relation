@@ -31,9 +31,10 @@ class RelationEndpointFullFormatter extends FormatterBase {
     $build = [];
 
     foreach ($items as $delta => $item) {
-      if ($entity = entity_load($item->entity_type, $item->entity_id)) {
+      $storage_handler = \Drupal::entityTypeManager()->getStorage($item->entity_type);
+      if ($entity = $storage_handler->load($item->entity_id)) {
         // @todo: allow view mode customisation.
-        $build[$delta] = entity_view($entity, 'teaser');
+        $build[$delta] = \Drupal::entityTypeManager()->getViewBuilder($entity->getEntityTypeId())->view($entity, 'teaser');
       }
     }
 

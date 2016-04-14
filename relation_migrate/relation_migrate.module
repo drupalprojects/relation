@@ -6,6 +6,8 @@
  */
 use Drupal\relation\Entity\RelationType;
 
+use Drupal\user\Entity\User;
+
 /**
  * Implements hook_menu().
  */
@@ -64,7 +66,7 @@ function relation_migrate_configuration_form($form, &$form_state) {
         '#element_validate' => array('_relation_migrate_validate_type'),
       );
 
-      $user = user_load(variable_get('relation_migrate_' . $field_type_name . '_user', 1));
+      $user = User::load(variable_get('relation_migrate_' . $field_type_name . '_user', 1));
       $form[$field_type_name]['relation_migrate_' . $field_type_name . '_user'] = array(
         '#type' => 'textfield',
         '#title' => t('User'),

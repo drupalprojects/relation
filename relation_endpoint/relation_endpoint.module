@@ -58,7 +58,8 @@ function relation_endpoint_field_validate(EntityInterface $entity, $field, $inst
     }
   }
   foreach ($items_to_load as $entity_type => $ids) {
-    $loaded_items[$entity_type] = entity_load_multiple($entity_type, $ids);
+    $storage_handler = \Drupal::entityTypeManager()->getStorage($entity_type);
+    $loaded_items[$entity_type] = $storage_handler->loadMultiple($ids);
   }
 
   // Check that each entity is has acceptable bundle type and index.

@@ -43,12 +43,13 @@ class RelationEndpointFormatter extends FormatterBase {
       $t = ['@entity_type' => $item->entity_type, '@entity_id' => $item->entity_id];
 
       try {
-        if ($entity = entity_load($item->entity_type, $item->entity_id)) {
+        $storage_handler = \Drupal::entityTypeManager()->getStorage($item->entity_type);
+        if ($entity = $storage_handler->load($item->entity_id)) {
           $label = $entity->label();
           $label_cell['data'] = [
             '#type' => 'link',
             '#title' => (!empty($label) && strlen($label) > 0) ? $label : t('Untitled', $t),
-          ] + $entity->urlInfo()->toRenderArray();
+          ] + $entity->toUrl()->toRenderArray();
         }
         else {
           $label_cell = t('Deleted');

@@ -23,7 +23,7 @@ class views_handler_field_relation_link_delete extends views_handler_field_relat
 
     $this->options['alter']['make_link'] = TRUE;
     $this->options['alter']['path'] = "relation/$relation->rid/delete";
-    $this->options['alter']['query'] = drupal_get_destination();
+    $this->options['alter']['query'] = \Drupal::destination()->getAsArray();
 
     $text = !empty($this->options['text']) ? $this->options['text'] : t('Delete');
     return $text;
