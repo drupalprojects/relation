@@ -200,6 +200,23 @@ class RelationAPITest extends RelationTestBase {
       $relation->delete();
     }
     $this->assertFalse(relation_get_related_entity('node', $this->node4->id()), 'The entity was not loaded after the relation was deleted.');
+
+    // Test get available relation types .
+    $available_articles = $this->container->get('entity.repository.relation_type')->getAvailable('node', 'article');
+    $article_labels = [];
+    foreach ($available_articles as $relation) {
+      $article_labels[] = $relation->label();
+    }
+    // Expect 3 available relation types for node article.
+    $this->assertEqual($article_labels, ['directional', 'octopus', 'symmetric']);
+
+    $available_users = $this->container->get('entity.repository.relation_type')->getAvailable('user', '*');
+    $user_labels = [];
+    foreach ($available_users as $relation) {
+      $user_labels[] = $relation->label();
+    }
+    // Expect 2 available relation types for user.
+    $this->assertEqual($user_labels, ['directional_entitydifferent', 'symmetric']);
   }
 
   /**

@@ -303,45 +303,6 @@ function relation_get_related_entity($entity_type, $entity_id, $relation_type = 
 }
 
 /**
- * Returns the relation types that can have the given entity as an endpoint.
- *
- * @param string $entity_type
- *   The entity type of the endpoint.
- * @param string $bundle
- *   The bundle of the endpoint.
- * @param string $endpoint
- *   (optional) the type of endpoint. This is only used for directional
- *   relation types. Possible options are 'source', 'target', or 'both'.
- *
- * @return array
- *   An array of relation types
- */
-function relation_get_available_relation_types($entity_type, $bundle, $endpoint = 'source') {
-  $bundle_key = $entity_type . ':' . $bundle;
-  $all_bundle_key = $entity_type . ':*';
-  $available_types = array();
-
-  foreach (RelationType::loadMultiple() as $relation_type) {
-    $available = FALSE;
-    if ($endpoint == 'source' || $endpoint == 'both') {
-      if (in_array($bundle_key, $relation_type->source_bundles) || in_array($all_bundle_key, $relation_type->source_bundles)) {
-        $available = TRUE;
-      }
-    }
-    if ($endpoint == 'target' || $endpoint == 'both') {
-      if (in_array($bundle_key, $relation_type->target_bundles) || in_array($all_bundle_key, $relation_type->target_bundles)) {
-        $available = TRUE;
-      }
-    }
-    if ($available) {
-      $available_types[] = $relation_type;
-    }
-  }
-
-  return $available_types;
-}
-
-/**
  * Implements hook_entity_delete().
  */
 function relation_entity_delete(EntityInterface $entity) {

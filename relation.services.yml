@@ -1,0 +1,4 @@
+services:
+  entity.repository.relation_type:
+    class: Drupal\relation\Entity\RelationTypeRepository
+    arguments: ['@entity_type.manager']
