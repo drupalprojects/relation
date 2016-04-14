@@ -148,7 +148,8 @@ function relation_rules_get_specific_endpoints($relation, array $options, $prope
 function relation_rules_set_endpoints(&$relation = NULL, $name = NULL, $entity_wrappers = NULL) {
   // Check that we are creating a new relation. Updating existing relations
   // aren't supported.
-  if (isset($relation->rid) || empty($entity_wrappers)) {
+  $relation_id = $relation->id();
+  if (isset($relation_id) || empty($entity_wrappers)) {
     return;
   }
 
@@ -419,7 +420,8 @@ function relation_rules_fetch_endpoint_form_alter(&$form, &$form_state, $options
  */
 function relation_rules_fetch_endpoint($relation, $entity_type, $number = 1) {
   // Make sure we have the fully loaded relation entity.
-  $loaded_relation = Relation::load($relation->rid);
+  $loaded_relation = Relation::load($relation->id());
+
   // Load the endpoints.
   $endpoints = field_get_items($loaded_relation, 'endpoints');
 
@@ -440,7 +442,7 @@ function relation_rules_fetch_endpoint($relation, $entity_type, $number = 1) {
     if (1 == $number) {
       $return = reset($return);
       if (!$return) {
-        throw new RulesEvaluationException('Unable to load relation endpoint of type "@type" for @entity with id "@id".', array('@type' => $entity_type, '@entity' => $relation->relation_type, '@id' => $relation->rid));
+        throw new RulesEvaluationException('Unable to load relation endpoint of type "@type" for @entity with id "@id".', array('@type' => $entity_type, '@entity' => $relation->relation_type, '@id' => $relation->id()));
       }
     }
     return array('endpoint_fetched' => $return);

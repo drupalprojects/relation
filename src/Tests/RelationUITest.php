@@ -43,9 +43,9 @@ class RelationUITest extends RelationTestBase {
     $relation = Relation::load($this->rid_directional);
 
     $this->drupalPostForm("relation/" . $relation->id() . "/delete", array(), t('Delete'));
-    $arg = [':rid' => $relation->id()];
-    $this->assertFalse((bool) Database::getConnection('default')->queryRange('SELECT * FROM {relation} WHERE rid = :rid', 0, 1, $arg)->fetchField(), 'Nothing in relation table after delete.');
-    $this->assertFalse((bool) Database::getConnection('default')->queryRange('SELECT * FROM {relation_revision} WHERE rid = :rid', 0, 1, $arg)->fetchField(), 'Nothing in relation revision table after delete.');
+    $arg = [':relation_id' => $relation->id()];
+    $this->assertFalse((bool) Database::getConnection('default')->queryRange('SELECT * FROM {relation} WHERE relation_id = :relation_id', 0, 1, $arg)->fetchField(), 'Nothing in relation table after delete.');
+    $this->assertFalse((bool) Database::getConnection('default')->queryRange('SELECT * FROM {relation_revision} WHERE relation_id = :relation_id', 0, 1, $arg)->fetchField(), 'Nothing in relation revision table after delete.');
     // @todo: test if field data was deleted.
     // CrudTest::testDeleteField has 'TODO: Also test deletion of the data
     // stored in the field ?'

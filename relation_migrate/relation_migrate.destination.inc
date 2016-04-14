@@ -15,7 +15,7 @@ class MigrateDestinationRelation extends MigrateDestinationEntity {
    */
   static public function getKeySchema() {
     return array(
-      'rid' => array(
+      'relation_id' => array(
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => TRUE,
@@ -46,7 +46,7 @@ class MigrateDestinationRelation extends MigrateDestinationEntity {
   public function fields() {
     $fields = array();
     // First the core (relation table) properties.
-    $fields['rid'] = t('Relation: Existing relation ID');
+    $fields['relation_id'] = t('Relation: Existing relation ID');
     $fields['is_new'] = t('Relation: Indicates a new relation with the specified rid should be created');
     $fields['uid'] = t('Relation: Authored by (uid)');
     $fields['created'] = t('Relation: Created timestamp');
@@ -91,30 +91,35 @@ class MigrateDestinationRelation extends MigrateDestinationEntity {
     if (isset($row->migrate_map_destid1)) {
       // Make sure is_new is off.
       $relation->is_new = FALSE;
-      if (isset($relation->rid)) {
-        if ($relation->rid != $row->migrate_map_destid1) {
-          throw new MigrateException(t("Incoming rid !rid and map destination rid !destid1 don't match",
-              array('!rid' => $relation->rid, '!destid1' => $row->migrate_map_destid1)
+      $relation_id = $relation->id();
+      if (isset($relation_id)) {
+        if ($relation_id != $row->migrate_map_destid1) {
+          throw new MigrateException(t("Incoming relation_id !relation_id and map destination relation_id !destid1 don't match",
+              array('!relation_id' => $relation->id(), '!destid1' => $row->migrate_map_destid1)
             ));
         }
       }
       else {
-        $relation->rid = $row->migrate_map_destid1;
+        $relation->set('id', $row->migrate_map_destid1);
       }
       // Get the existing vid, so updates don't generate notices.
-      $values = \Drupal::database()->select('relation', 'r')->fields('r', array('vid'))->condition('rid', $relation->rid)->execute()->fetchAssoc();
-      $relation->vid = $values['vid'];
+      $values = \Drupal::database()->select('relation', 'r')->fields('r', array('vid'))->condition('rid', $relation->id())->execute()->fetchAssoc();
+      $relation->set('revision_id', $values['revision_id']);
     }
     if ($migration->getSystemOfRecord() == Migration::DESTINATION) {
-      if (!isset($relation->rid)) {
+      $relation_id = $relation->id();
+      if (!isset($relation_id)) {
         throw new MigrateException(t('System-of-record is DESTINATION, but no destination rid provided'));
       }
-      $old_relation = Relation::load($relation->rid);
+
+      $old_relation = Relation::load($relation->id());
+
       if (!isset($relation->created)) {
         $relation->created = $old_relation->created;
       }
-      if (!isset($relation->vid)) {
-        $relation->vid = $old_relation->vid;
+      $relation_revision_id = $relation->getRevisionId();
+      if (!isset($relation_revision_id)) {
+        $relation->set('revision_id', $old_relation->getRevisionId());
       }
       if (!isset($relation->uid)) {
         $relation->uid = $old_relation->uid;
@@ -158,7 +163,8 @@ class MigrateDestinationRelation extends MigrateDestinationEntity {
     // Invoke migration prepare handlers.
     $this->prepare($relation, $row);
 
-    if (isset($relation->rid) && empty($relation->is_new)) {
+    $relation_id = $relation->id();
+    if (isset($relation_id) && empty($relation->is_new)) {
       $updating = TRUE;
     }
     else {
@@ -167,10 +173,10 @@ class MigrateDestinationRelation extends MigrateDestinationEntity {
 
     // Save relation object.
     migrate_instrument_start('relation_save');
-    $rid = relation_save($relation);
+    $relation_id = relation_save($relation);
     migrate_instrument_stop('relation_save');
 
-    if (isset($relation->rid)) {
+    if (isset($relation_id)) {
       if ($updating) {
         $this->numUpdated++;
       }
@@ -180,16 +186,16 @@ class MigrateDestinationRelation extends MigrateDestinationEntity {
 
       // Update changed and created dates if needed.
       if (isset($changed)) {
-        \Drupal::database()->update('relation')->fields(array('changed' => $changed))->condition('rid', $relation->rid)->execute();
+        \Drupal::database()->update('relation')->fields(array('changed' => $changed))->condition('rid', $relation->id())->execute();
         $relation->changed = $changed;
       }
 
       if (isset($created)) {
-        \Drupal::database()->update('relation')->fields(array('created' => $created))->condition('rid', $relation->rid)->execute();
+        \Drupal::database()->update('relation')->fields(array('created' => $created))->condition('rid', $relation->id())->execute();
         $relation->created = $created;
       }
 
-      $return = array($relation->rid);
+      $return = array($relation->id());
     }
     else {
       $return = FALSE;

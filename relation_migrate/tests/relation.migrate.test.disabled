@@ -55,7 +55,7 @@ class RelationMigrateTestCase extends RelationTestCase {
     $this->node5 = $this->drupalCreateNode(array('type' => 'article'));
     $this->tag = (object) array(
       'name' => $this->randomMachineName(8),
-      'vid' => 1,
+      'revision_id' => 1,
     );
     taxonomy_term_save($this->tag);
 

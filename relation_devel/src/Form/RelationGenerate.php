@@ -6,8 +6,10 @@
  */
 
 namespace Drupal\relation_devel\Form;
+
 use Drupal\Core\Form\FormBase;
 use Drupal\relation\Entity\RelationType;
+use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Provides a form for generating dummy relations.
@@ -23,7 +25,7 @@ class RelationGenerate extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, array &$form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state) {
     $relation_types = RelationType::loadMultiple();
 
     if (empty($relation_types)) {
@@ -71,7 +73,7 @@ class RelationGenerate extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, array &$form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state) {
     $number = $form_state['values']['relation_number'];
     $relation_types = $form_state['values']['relation_types'];
     $kill = $form_state['values']['relation_kill'];

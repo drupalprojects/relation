@@ -22,12 +22,12 @@ function relation_views_data() {
 
   // Advertise this table as a possible base table.
   $data['relation']['table']['base'] = array(
-    'field' => 'rid',
+    'field' => 'relation_id',
     'title' => t('Relation'),
     'weight' => -10,
   );
   $data['relation']['table']['entity type'] = 'relation';
-  $data['relation']['rid'] = array(
+  $data['relation']['relation_id'] = array(
     'title' => t('Rid'),
     'help' => t('The relation ID.'),
     'field' => array(
@@ -66,7 +66,7 @@ function relation_views_data() {
     ),
   );
 
-  $data['relation']['vid'] = array(
+  $data['relation']['revision_id'] = array(
     'title' => t('Vid'),
     'help' => t('The relation revision ID.'),
     'field' => array(
@@ -173,9 +173,9 @@ function relation_views_data() {
     'field' => array(
       'handler' => 'views_handler_field_relation_link',
       'click sortable' => TRUE,
-      'real field' => 'rid',
+      'real field' => 'relation_id',
       'additional fields' => array(
-        'rid',
+        'relation_id',
       ),
     ),
   );
@@ -187,9 +187,9 @@ function relation_views_data() {
     'field' => array(
       'handler' => 'views_handler_field_relation_link_edit',
       'click sortable' => TRUE,
-      'real field' => 'rid',
+      'real field' => 'relation_id',
       'additional fields' => array(
-        'rid',
+        'relation_id',
       ),
     ),
   );
@@ -201,9 +201,9 @@ function relation_views_data() {
     'field' => array(
       'handler' => 'views_handler_field_relation_link_delete',
       'click sortable' => TRUE,
-      'real field' => 'rid',
+      'real field' => 'relation_id',
       'additional fields' => array(
-        'rid',
+        'relation_id',
       ),
     ),
   );
@@ -241,7 +241,7 @@ function relation_views_data_alter(&$data) {
           'relationship' => array(
             'label' => $relation_type->label,
             'base' => 'relation',
-            'base field' => 'rid',
+            'base field' => 'relation_id',
             'relationship field' => $entity_info[$source_entity_type]->getKey('id'),
             'id' => 'relation_relationship',
             'relation_type' => $type,
@@ -283,7 +283,7 @@ function relation_views_data_alter(&$data) {
               'label' => $relation_type->label,
               'base' => $target_table,
               'base field' => $entity_info[$target_entity_type]->getKey('id'),
-              'relationship field' => 'rid',
+              'relationship field' => 'relation_id',
               'id' => 'relation_relationship',
               'relation_type' => $type,
               'entity_type_right' => $target_entity_type,
@@ -319,7 +319,7 @@ function relation_views_data_alter(&$data) {
               'relationship' => array(
                 'label' => $relation_type->reverse_label,
                 'base' => 'relation',
-                'base field' => 'rid',
+                'base field' => 'relation_id',
                 'relationship field' => $entity_info[$target_entity_type]->getKey('id'),
                 'id' => 'relation_relationship',
                 'relation_type' => $type,
@@ -337,7 +337,7 @@ function relation_views_data_alter(&$data) {
                 'label' => $relation_type->reverse_label,
                 'base' => $source_table,
                 'base field' => $entity_info[$source_entity_type]->getKey('id'),
-                'relationship field' => 'rid',
+                'relationship field' => 'relation_id',
                 'id' => 'relation_relationship',
                 'relation_type' => $type,
                 'entity_type_left' => $source_entity_type,

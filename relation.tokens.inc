@@ -18,11 +18,11 @@ function relation_token_info() {
   );
 
   // Core tokens for relations.
-  $relation['rid'] = array(
+  $relation['relation_id'] = array(
     'name' => t("Relation ID"),
     'description' => t('The unique ID of the relation.'),
   );
-  $relation['vid'] = array(
+  $relation['revision_id'] = array(
     'name' => t("Revision ID"),
     'description' => t("The unique ID of the relation's latest revision."),
   );
@@ -92,12 +92,12 @@ function relation_tokens($type, $tokens, array $data = array(), array $options =
     foreach ($tokens as $name => $original) {
       switch ($name) {
         // Simple key values on the relation.
-        case 'rid':
-          $replacements[$original] = $relation->rid;
+        case 'relation_id':
+          $replacements[$original] = $relation->id();
           break;
 
-        case 'vid':
-          $replacements[$original] = $relation->vid;
+        case 'revision_id':
+          $replacements[$original] = $relation->getRevisionId();
           break;
 
         case 'relation_type':
@@ -105,16 +105,16 @@ function relation_tokens($type, $tokens, array $data = array(), array $options =
           break;
 
         case 'type-name':
-          $type_label = $relation->relation_type_label();
+          $type_label = $relation->relation_type->entity->label();
           $replacements[$original] = $sanitize ? check_plain($type_label) : $type_label;
           break;
 
         case 'url':
-          $replacements[$original] = url('relation/' . $relation->rid, $url_options);
+          $replacements[$original] = url('relation/' . $relation->id(), $url_options);
           break;
 
         case 'edit-url':
-          $replacements[$original] = url('relation/' . $relation->rid . '/edit', $url_options);
+          $replacements[$original] = url('relation/' . $relation->id() . '/edit', $url_options);
           break;
 
         // Default values for the chained tokens handled below.

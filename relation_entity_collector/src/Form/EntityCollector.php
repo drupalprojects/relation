@@ -257,7 +257,8 @@ class EntityCollector extends FormBase {
       array_multisort($form_state['values']['table']['weight'], SORT_ASC, $relation->endpoints[Language::LANGCODE_NOT_SPECIFIED]);
       $relation->save();
       if ($relation->id()) {
-        $link = l($relation->relation_type_label(), "relation/$rid");
+        $relation_id = $relation->id();
+        $link = l($relation->relation_type->entity->label(), "relation/$relation_id");
         $list = _relation_stored_entity_keys_list();
         $rendered_list = \Drupal::service('renderer')->render($list);
         $t_arguments = array('!link' => $link, '!list' => $rendered_list);

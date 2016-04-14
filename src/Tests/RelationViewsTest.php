@@ -48,18 +48,18 @@ class RelationViewsTest extends RelationTestBase {
       $handler->display->display_options['relationships']['uid']['id'] = 'uid';
       $handler->display->display_options['relationships']['uid']['table'] = 'relation';
       $handler->display->display_options['relationships']['uid']['field'] = 'uid';
-      $handler->display->display_options['fields']['rid']['id'] = 'rid';
-      $handler->display->display_options['fields']['rid']['table'] = 'relation';
-      $handler->display->display_options['fields']['rid']['field'] = 'rid';
+      $handler->display->display_options['fields']['relation_id']['id'] = 'relation_id';
+      $handler->display->display_options['fields']['relation_id']['table'] = 'relation';
+      $handler->display->display_options['fields']['relation_id']['field'] = 'relation_id';
       $handler->display->display_options['fields']['relation_type']['id'] = 'relation_type';
       $handler->display->display_options['fields']['relation_type']['table'] = 'relation';
       $handler->display->display_options['fields']['relation_type']['field'] = 'relation_type';
       $handler->display->display_options['fields']['arity']['id'] = 'arity';
       $handler->display->display_options['fields']['arity']['table'] = 'relation';
       $handler->display->display_options['fields']['arity']['field'] = 'arity';
-      $handler->display->display_options['arguments']['rid']['id'] = 'rid';
-      $handler->display->display_options['arguments']['rid']['table'] = 'relation';
-      $handler->display->display_options['arguments']['rid']['field'] = 'rid';
+      $handler->display->display_options['arguments']['relation_id']['id'] = 'relation_id';
+      $handler->display->display_options['arguments']['relation_id']['table'] = 'relation';
+      $handler->display->display_options['arguments']['relation_id']['field'] = 'relation_id';
       $view->set_arguments(array($this->{'rid_' . $relation_type}));
       $view->execute();
 
@@ -69,32 +69,32 @@ class RelationViewsTest extends RelationTestBase {
       switch ($relation_type) {
         case 'symmetric':
           // Relation #1 is of type symmetric and has 2 endpoints.
-          $this->assertEqual($result->rid, 1);
+          $this->assertEqual($result->relation_id, 1);
           $this->assertEqual($result->relation_arity, 2);
           break;
 
         case 'directional':
           // Relation #2 is of type directional and has 2 endpoints.
-          $this->assertEqual($result->rid, 2);
+          $this->assertEqual($result->relation_id, 2);
           $this->assertEqual($result->relation_arity, 2);
           break;
 
         case 'directional_entitysame':
           // Relation #4 is of type directional_entitysame and has 2 endpoints.
-          $this->assertEqual($result->rid, 4);
+          $this->assertEqual($result->relation_id, 4);
           $this->assertEqual($result->relation_arity, 2);
           break;
 
         case 'directional_entitydifferent':
           // Relation #7 is of type directional_entitydifferent and has 2
           // endpoints.
-          $this->assertEqual($result->rid, 7);
+          $this->assertEqual($result->relation_id, 7);
           $this->assertEqual($result->relation_arity, 2);
           break;
 
         case 'octopus':
           // Relation #4 is of type octopus and has 4 endpoints.
-          $this->assertEqual($result->rid, 9);
+          $this->assertEqual($result->relation_id, 9);
           $this->assertEqual($result->relation_arity, 4);
           break;
       }

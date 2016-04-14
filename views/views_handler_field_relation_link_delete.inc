@@ -22,7 +22,8 @@ class views_handler_field_relation_link_delete extends views_handler_field_relat
     }
 
     $this->options['alter']['make_link'] = TRUE;
-    $this->options['alter']['path'] = "relation/$relation->rid/delete";
+    $relation_id = $relation->id();
+    $this->options['alter']['path'] = "relation/$relation_id/delete";
     $this->options['alter']['query'] = \Drupal::destination()->getAsArray();
 
     $text = !empty($this->options['text']) ? $this->options['text'] : t('Delete');

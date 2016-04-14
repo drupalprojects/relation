@@ -144,7 +144,7 @@ class RelationAPITest extends RelationTestBase {
     // Get last two relations for node 1.
     $relations = relation_query('node', $this->node1->id())
       ->range(1, 2)
-      ->sort('rid', 'ASC')
+      ->sort('relation_id', 'ASC')
       ->execute();
     $count = count($relations);
     $this->assertEqual($count, 2);
@@ -234,10 +234,10 @@ class RelationAPITest extends RelationTestBase {
       $this->assertFalse($need_ids, 'All ids found.');
       // Confirm the rid in revision table.
       $revision = \Drupal::database()->select('relation_revision', 'v')
-          ->fields('v', array('rid'))
-          ->condition('vid', $relation->vid->value)
+          ->fields('v', array('relation_id'))
+          ->condition('vid', $relation->revision_id->value)
           ->execute()
-          ->fetchAllAssoc('rid');
+          ->fetchAllAssoc('relation_id');
       $this->assertTrue(array_key_exists($relation->id(), $revision), 'Relation revision created.');
     }
   }
@@ -278,9 +278,8 @@ class RelationAPITest extends RelationTestBase {
     $this->assertEqual($relation->id(), $first_user->id(), 'Relation uid did not get changed to a user different to original.');
 
     // Relation revision authors should not be identical though.
-    $storage_handler = \Drupal::entityTypeManager()->getStorage('relation');
-    $first_revision = $storage_handler->load($vid);
-    $second_revision = $storage_handler->load($relation->vid);
+    $first_revision = $this->container->get('entity_type.manager')->getStorage('relation')->loadRevision($vid);
+    $second_revision = $this->container->get('entity_type.manager')->getStorage('relation')->loadRevision($relation->revision_id);
     $this->assertNotIdentical($first_revision->revision_uid, $second_revision->revision_uid, 'Each revision has a distinct user.');
     */
   }

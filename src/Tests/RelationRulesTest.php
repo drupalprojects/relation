@@ -68,7 +68,7 @@ class RelationRulesTest extends RelationTestBase {
 
       // There is no way for the rule to return the created relation. So get the
       // last inserted id, which should be the relation we are looking for.
-      $rid = \Drupal::database()->query('SELECT MAX(rid) FROM {relation}')->fetchField();
+      $rid = \Drupal::database()->query('SELECT MAX(relation_id) FROM {relation}')->fetchField();
       // If all went well, we should now have a relation with correct endpoints.
       $relation = Relation::load($rid);
       $correct = ($relation->endpoints[Language::LANGCODE_NOT_SPECIFIED][0]['entity_id'] == $node->nid) && ($relation->endpoints[Language::LANGCODE_NOT_SPECIFIED][1]['entity_id'] == $user->uid);
@@ -94,8 +94,8 @@ class RelationRulesTest extends RelationTestBase {
       // There is no way for the rule to return the created relation. So get the
       // last inserted id, which should be the relation we are looking for.
 
-      $rid = \Drupal::database()->query('SELECT MAX(rid) FROM {relation}')->fetchField();
-      $relation = relation_load($rid);
+      $rid = \Drupal::database()->query('SELECT MAX(relation_id) FROM {relation}')->fetchField();
+      $relation = Relation::load($rid);
 
       // The $node and the $user should be the the same as in the last test,
       // since we fetched the endpoits from that relation.
