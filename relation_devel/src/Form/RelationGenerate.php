@@ -80,7 +80,7 @@ class RelationGenerate extends FormBase {
     include_once drupal_get_path('module', 'relation') . '/relation.drush.inc';
     $relation_types = array_keys(array_filter($relation_types));
     $relation_types = empty($relation_types) ? NULL : $relation_types;
-    $rids = relation_generate_relations($number, $relation_types, $kill);
+    $relation_ids = relation_generate_relations($number, $relation_types, $kill);
   }
 
 }

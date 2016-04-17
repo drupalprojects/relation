@@ -181,12 +181,12 @@ function relation_rules_get_related_entities($entity, array $options, $name, $ty
     ->entityCondition('bundle', $info['relation_type'])
     ->range(0, 50)
     ->execute();
-  $rids = array_keys($results);
+  $relation_ids = array_keys($results);
   $entities_ids = array();
-  if (!$rids) {
+  if (!$relation_ids) {
     return $entities_ids;
   }
-  foreach (Relation::loadMultiple($rids) as $relation) {
+  foreach (Relation::loadMultiple($relation_ids) as $relation) {
     foreach ($relation->endpoints[Language::LANGCODE_NOT_SPECIFIED] as $endpoint) {
       if ($endpoint['entity_type'] == $info['target_type']) {
         $entities_ids[] = $endpoint['entity_id'];

@@ -28,7 +28,7 @@ function relation_views_data() {
   );
   $data['relation']['table']['entity type'] = 'relation';
   $data['relation']['relation_id'] = array(
-    'title' => t('Rid'),
+    'title' => t('Relation ID'),
     'help' => t('The relation ID.'),
     'field' => array(
       'id' => 'numeric',
@@ -67,7 +67,7 @@ function relation_views_data() {
   );
 
   $data['relation']['revision_id'] = array(
-    'title' => t('Vid'),
+    'title' => t('Revision ID'),
     'help' => t('The relation revision ID.'),
     'field' => array(
       'id' => 'numeric',

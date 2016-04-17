@@ -47,7 +47,7 @@ class MigrateDestinationRelation extends MigrateDestinationEntity {
     $fields = array();
     // First the core (relation table) properties.
     $fields['relation_id'] = t('Relation: Existing relation ID');
-    $fields['is_new'] = t('Relation: Indicates a new relation with the specified rid should be created');
+    $fields['is_new'] = t('Relation: Indicates a new relation with the specified relation ID should be created');
     $fields['uid'] = t('Relation: Authored by (uid)');
     $fields['created'] = t('Relation: Created timestamp');
     $fields['changed'] = t('Relation: Modified timestamp');
@@ -62,14 +62,14 @@ class MigrateDestinationRelation extends MigrateDestinationEntity {
   /**
    * Delete a batch of relations at once.
    *
-   * @param $rids
+   * @param $relation_ids
    *   Array of relation IDs to be deleted.
    */
-  public function bulkRollback(array $rids) {
+  public function bulkRollback(array $relation_ids) {
     migrate_instrument_start('relation_delete_multiple');
-    $this->prepareRollback($rids);
-    relation_delete_multiple($rids);
-    $this->completeRollback($rids);
+    $this->prepareRollback($relation_ids);
+    relation_delete_multiple($relation_ids);
+    $this->completeRollback($relation_ids);
     migrate_instrument_stop('relation_delete_multiple');
   }
 
@@ -82,7 +82,7 @@ class MigrateDestinationRelation extends MigrateDestinationEntity {
    *   Raw source data object - passed through to prepare/complete handlers.
    *
    * @return array
-   *  Array of key fields (rid only in this case) of the relation that was saved if
+   *  Array of key fields (relation ID only in this case) of the relation that was saved if
    *  successful. FALSE on failure.
    */
   public function import(stdClass $relation, stdClass $row) {
@@ -102,14 +102,14 @@ class MigrateDestinationRelation extends MigrateDestinationEntity {
       else {
         $relation->set('id', $row->migrate_map_destid1);
       }
-      // Get the existing vid, so updates don't generate notices.
-      $values = \Drupal::database()->select('relation', 'r')->fields('r', array('vid'))->condition('rid', $relation->id())->execute()->fetchAssoc();
+      // Get the existing revision_id, so updates don't generate notices.
+      $values = \Drupal::database()->select('relation', 'r')->fields('r', array('revision_id'))->condition('relation_id', $relation->id())->execute()->fetchAssoc();
       $relation->set('revision_id', $values['revision_id']);
     }
     if ($migration->getSystemOfRecord() == Migration::DESTINATION) {
       $relation_id = $relation->id();
       if (!isset($relation_id)) {
-        throw new MigrateException(t('System-of-record is DESTINATION, but no destination rid provided'));
+        throw new MigrateException(t('System-of-record is DESTINATION, but no destination relation_id provided'));
       }
 
       $old_relation = Relation::load($relation->id());
@@ -186,12 +186,12 @@ class MigrateDestinationRelation extends MigrateDestinationEntity {
 
       // Update changed and created dates if needed.
       if (isset($changed)) {
-        \Drupal::database()->update('relation')->fields(array('changed' => $changed))->condition('rid', $relation->id())->execute();
+        \Drupal::database()->update('relation')->fields(array('changed' => $changed))->condition('relation_id', $relation->id())->execute();
         $relation->changed = $changed;
       }
 
       if (isset($created)) {
-        \Drupal::database()->update('relation')->fields(array('created' => $created))->condition('rid', $relation->id())->execute();
+        \Drupal::database()->update('relation')->fields(array('created' => $created))->condition('relation_id', $relation->id())->execute();
         $relation->created = $created;
       }
 

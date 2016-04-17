@@ -57,7 +57,7 @@ class RelationEntityCollectorTest extends RelationTestBase {
     );
     $this->drupalPostForm('node', $edit, t('Pick'));
     $this->drupalPostForm('node', array(), t('Save relation'));
-    // Now figure out the new rid.
+    // Now figure out the new relation id.
     $result = array_keys(relation_query('node', $this->node3->nid)
       ->condition('relation_type', $relation_type)
       ->execute());

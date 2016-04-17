@@ -60,7 +60,7 @@ class RelationViewsTest extends RelationTestBase {
       $handler->display->display_options['arguments']['relation_id']['id'] = 'relation_id';
       $handler->display->display_options['arguments']['relation_id']['table'] = 'relation';
       $handler->display->display_options['arguments']['relation_id']['field'] = 'relation_id';
-      $view->set_arguments(array($this->{'rid_' . $relation_type}));
+      $view->set_arguments(array($this->{'relation_id_' . $relation_type}));
       $view->execute();
 
       $result = array_shift($view->result);

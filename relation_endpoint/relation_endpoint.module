@@ -27,8 +27,8 @@ function relation_endpoint_field_validate(EntityInterface $entity, $field, $inst
   // Check if the relation type is unique and if so, check if a relation between
   // those items exist already.
   if ($relation_type->r_unique) {
-    $rids = relation_relation_exists($items, $entity->relation_type);
-    if ($rids && (!isset($entity->relation_id) || !isset($rids[$entity->relation_id]))) {
+    $relation_ids = relation_relation_exists($items, $entity->relation_type);
+    if ($relation_ids && (!isset($entity->relation_id) || !isset($relation_ids[$entity->relation_id]))) {
       $errors[$field['field_name']][$langcode][0][] = array(
         'error' => 'relation_already_exists',
         'message' => t("The !relation_type is unique but the relation already exists.", array('!relation_type' => $entity->relation_type)),

@@ -66,7 +66,7 @@ function relation_generate_message($message) {
  *   Whether to delete all existing relations before creating new ones.
  *
  * @return
- *   Array of rids of the generated relations.
+ *   Array of relation IDs of the generated relations.
  */
 function relation_generate_relations($number_relations = 10, $relation_types = array(), $kill = FALSE) {
   $relation_types = RelationType::loadMultiple($relation_types);
@@ -82,7 +82,7 @@ function relation_generate_relations($number_relations = 10, $relation_types = a
     }
   }
 
-  $new_rids = array();
+  $new_relation_ids = array();
   foreach ($relation_types as $relation_type) {
     $available_types = array();
     foreach ($relation_type->source_bundles as $bundle_key) {
@@ -124,7 +124,7 @@ function relation_generate_relations($number_relations = 10, $relation_types = a
       $relation = Relation::create(array('relation_type' => $relation_type->id()));
       $relation->endpoints = $endpoints;
       $relation->save();
-      $new_rids[] = $relation->id();
+      $new_relation_ids[] = $relation->id();
       relation_generate_message(
         \Drupal::translation()->formatPlural(
           $number_relations,
@@ -134,5 +134,5 @@ function relation_generate_relations($number_relations = 10, $relation_types = a
         ), 'ok');
     }
   }
-  return $new_rids;
+  return $new_relation_ids;
 }

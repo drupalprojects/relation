@@ -47,11 +47,11 @@ class RelationAPITest extends RelationTestBase {
     // Where relation type is set.
     $exists = relation_relation_exists($this->endpoints, $this->relation_type_symmetric);
     $this->verbose(print_r($exists, TRUE));
-    $this->assertTrue(isset($exists[$this->rid_symmetric]), 'Relation exists.');
+    $this->assertTrue(isset($exists[$this->relation_id_symmetric]), 'Relation exists.');
 
     // Where relation type is not set.
     $exists = relation_relation_exists($this->endpoints_4);
-    $this->assertTrue(isset($exists[$this->rid_octopus]), 'Relation exists.');
+    $this->assertTrue(isset($exists[$this->relation_id_octopus]), 'Relation exists.');
 
     // Where endpoints does not exist.
     $endpoints_do_not_exist = $this->endpoints;
@@ -77,7 +77,7 @@ class RelationAPITest extends RelationTestBase {
     $relations = Relation::loadMultiple(array_keys(relation_query('node', $this->node1->id())->execute()));
 
     // Check that symmetric relation is correctly related to node 4.
-    $this->assertEqual($relations[$this->rid_symmetric]->endpoints[1]->entity_id, $this->node4->id(), 'Correct entity is related: ' . $relations[$this->rid_symmetric]->endpoints[1]->entity_id . '==' . $this->node4->id());
+    $this->assertEqual($relations[$this->relation_id_symmetric]->endpoints[1]->entity_id, $this->node4->id(), 'Correct entity is related: ' . $relations[$this->relation_id_symmetric]->endpoints[1]->entity_id . '==' . $this->node4->id());
 
     // Symmetric relation is Article 1 <--> Page 4
     // @see https://drupal.org/node/1760026
@@ -116,7 +116,7 @@ class RelationAPITest extends RelationTestBase {
     $relations = relation_query('node', $this->node3->id(), 1)
       ->execute();
     $this->assertEqual(count($relations), 3);
-    $this->assertTrue(isset($relations[$this->rid_directional]), 'Got the correct directional relation for nid=3.');
+    $this->assertTrue(isset($relations[$this->relation_id_directional]), 'Got the correct directional relation for nid=3.');
 
     // Get relations between entities 2 and 3 (octopus).
     $query = relation_query('node', $this->node2->id());
@@ -125,7 +125,7 @@ class RelationAPITest extends RelationTestBase {
     $count = count($relations);
     $this->assertEqual($count, 1);
     // Check that we have the correct relations.
-    $this->assertEqual(isset($relations[$this->rid_octopus]), 'Got one correct relation.');
+    $this->assertEqual(isset($relations[$this->relation_id_octopus]), 'Got one correct relation.');
 
     // Get relations for node 1 (symmetric, directional, octopus), limit to
     // directional and octopus with relation_type().
@@ -138,8 +138,8 @@ class RelationAPITest extends RelationTestBase {
     $count = count($relations);
     $this->assertEqual($count, 2);
     // Check that we have the correct relations.
-    $this->assertTrue(isset($relations[$this->rid_directional]), 'Got one correct relation.');
-    $this->assertTrue(isset($relations[$this->rid_octopus]), 'Got a second one.');
+    $this->assertTrue(isset($relations[$this->relation_id_directional]), 'Got one correct relation.');
+    $this->assertTrue(isset($relations[$this->relation_id_octopus]), 'Got a second one.');
 
     // Get last two relations for node 1.
     $relations = relation_query('node', $this->node1->id())
@@ -149,17 +149,17 @@ class RelationAPITest extends RelationTestBase {
     $count = count($relations);
     $this->assertEqual($count, 2);
     // Check that we have the correct relations.
-    $this->assertTrue(isset($relations[$this->rid_directional]), 'Got one correct relation.');
-    $this->assertTrue(isset($relations[$this->rid_octopus]), 'Got a second one.');
+    $this->assertTrue(isset($relations[$this->relation_id_directional]), 'Got one correct relation.');
+    $this->assertTrue(isset($relations[$this->relation_id_octopus]), 'Got a second one.');
 
     // Get all relations on node 1 and sort them in reverse created order.
     $relations = relation_query('node', $this->node1->id())
       ->sort('created', 'DESC')
       ->execute();
     $this->assertEqual($relations, [
-      $this->rid_octopus => $this->rid_octopus,
-      $this->rid_directional => $this->rid_directional,
-      $this->rid_symmetric => $this->rid_symmetric,
+      $this->relation_id_octopus => $this->relation_id_octopus,
+      $this->relation_id_directional => $this->relation_id_directional,
+      $this->relation_id_symmetric => $this->relation_id_symmetric,
     ]);
 
     // Create 10 more symmetric relations and verify that the count works with
@@ -249,10 +249,10 @@ class RelationAPITest extends RelationTestBase {
         unset($need_ids[$endpoint->entity_id]);
       }
       $this->assertFalse($need_ids, 'All ids found.');
-      // Confirm the rid in revision table.
+      // Confirm the relation_id in revision table.
       $revision = \Drupal::database()->select('relation_revision', 'v')
           ->fields('v', array('relation_id'))
-          ->condition('vid', $relation->revision_id->value)
+          ->condition('revision_id', $relation->getRevisionId())
           ->execute()
           ->fetchAllAssoc('relation_id');
       $this->assertTrue(array_key_exists($relation->id(), $revision), 'Relation revision created.');
@@ -266,9 +266,9 @@ class RelationAPITest extends RelationTestBase {
     // Invalid relations are deleted when any endpoint entity is deleted.
     // Octopus relation is valid with 3 endpoints, currently it has 4.
     $this->node1->delete();
-    $this->assertTrue(Relation::load($this->rid_octopus), 'Relation is not deleted.');
+    $this->assertTrue(Relation::load($this->relation_id_octopus), 'Relation is not deleted.');
     $this->node2->delete();
-    $this->assertFalse(Relation::load($this->rid_octopus), 'Relation is deleted.');
+    $this->assertFalse(Relation::load($this->relation_id_octopus), 'Relation is deleted.');
   }
 
   /**
@@ -283,20 +283,20 @@ class RelationAPITest extends RelationTestBase {
     $relation = Relation::create(array('relation_type' => $this->relation_type_octopus));
     $relation->endpoints = $this->endpoints_4;
     $relation->save();
-    $rid = $relation->id();
+    $relation_id = $relation->id();
     $this->assertEqual($relation->id(), $first_user->id(), 'Relation uid set to logged in user.');
-    $vid = $relation->getRevisionId();
+    $revision_id = $relation->getRevisionId();
 
     // Relation should still be owned by the first user.
     $this->drupalLogin($second_user);
-    $relation = Relation::load($rid);
-    $relation = $this->container->get('entity_type.manager')->getStorage('relation')->load($rid);
+    $relation = Relation::load($relation_id);
+    $relation = $this->container->get('entity_type.manager')->getStorage('relation')->load($relation_id);
     $relation->save();
     $this->assertEqual($relation->id(), $first_user->id(), 'Relation uid did not get changed to a user different to original.');
 
     // Relation revision authors should not be identical though.
-    $first_revision = $this->container->get('entity_type.manager')->getStorage('relation')->loadRevision($vid);
-    $second_revision = $this->container->get('entity_type.manager')->getStorage('relation')->loadRevision($relation->revision_id);
+    $first_revision = $this->container->get('entity_type.manager')->getStorage('relation')->loadRevision($revision_id);
+    $second_revision = $this->container->get('entity_type.manager')->getStorage('relation')->loadRevision($relation->getRevisionId());
     $this->assertNotIdentical($first_revision->revision_uid, $second_revision->revision_uid, 'Each revision has a distinct user.');
     */
   }

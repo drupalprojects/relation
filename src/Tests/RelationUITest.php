@@ -40,7 +40,7 @@ class RelationUITest extends RelationTestBase {
    * Tests deletion of a relation.
    */
   public function testRelationDelete() {
-    $relation = Relation::load($this->rid_directional);
+    $relation = Relation::load($this->relation_id_directional);
 
     $this->drupalPostForm("relation/" . $relation->id() . "/delete", array(), t('Delete'));
     $arg = [':relation_id' => $relation->id()];

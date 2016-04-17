@@ -68,9 +68,9 @@ class RelationRulesTest extends RelationTestBase {
 
       // There is no way for the rule to return the created relation. So get the
       // last inserted id, which should be the relation we are looking for.
-      $rid = \Drupal::database()->query('SELECT MAX(relation_id) FROM {relation}')->fetchField();
+      $relation_id = \Drupal::database()->query('SELECT MAX(relation_id) FROM {relation}')->fetchField();
       // If all went well, we should now have a relation with correct endpoints.
-      $relation = Relation::load($rid);
+      $relation = Relation::load($relation_id);
       $correct = ($relation->endpoints[Language::LANGCODE_NOT_SPECIFIED][0]['entity_id'] == $node->nid) && ($relation->endpoints[Language::LANGCODE_NOT_SPECIFIED][1]['entity_id'] == $user->uid);
       $this->assertTrue($correct, 'Relation was created by setting two endpoints from rule context and saving it.');
 
@@ -79,7 +79,7 @@ class RelationRulesTest extends RelationTestBase {
       // the endpoint property get callback.
       $rule = rule();
       // This will load a relation into the context of the rule.
-      $rule->action('entity_fetch', array('type' => 'relation', 'id' => $rid));
+      $rule->action('entity_fetch', array('type' => 'relation', 'id' => $relation_id));
       $rule->action('entity_create', array(
         'type' => 'relation',
         'param_relation_type' => $this->relation_types['symmetric']['relation_type'],
@@ -94,8 +94,8 @@ class RelationRulesTest extends RelationTestBase {
       // There is no way for the rule to return the created relation. So get the
       // last inserted id, which should be the relation we are looking for.
 
-      $rid = \Drupal::database()->query('SELECT MAX(relation_id) FROM {relation}')->fetchField();
-      $relation = Relation::load($rid);
+      $relation_id = \Drupal::database()->query('SELECT MAX(relation_id) FROM {relation}')->fetchField();
+      $relation = Relation::load($relation_id);
 
       // The $node and the $user should be the the same as in the last test,
       // since we fetched the endpoits from that relation.
