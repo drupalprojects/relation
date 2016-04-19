@@ -76,51 +76,6 @@ function relation_get_relation_types_options() {
 }
 
 /**
- * Checks if a relation exists.
- *
- * The following example demonstrates how to check if a relation of type
- * 'likes' exists between two entities, user 17 and node 253.
- *
- * @code
- *   $endpoints = array(
- *     array('entity_type' => 'user', 'entity_id' => 17),
- *     array('entity_type' => 'node', 'entity_id' => 253),
- *   );
- *   $relation_type = 'likes';
- *   $results = relation_relation_exists($endpoints, $relation_type);
- * @endcode
- *
- * @param array $endpoints
- *   An array containing endpoints. Each endpoint is an array with keys
- *   'entity_type' and 'entity_id'. The keys of each endpoint correspond to
- *   'r_index' if $enforce_direction is TRUE.
- * @param string $relation_type
- *   (Optional) The relation type (bundle) of the relation to be checked.
- * @param bool $enforce_direction
- *   (Optional) Whether to enforce direction as specified in $endpoints.
- *
- * @return array
- *   Array of Relation ID's keyed by revision ID.
- */
-function relation_relation_exists(array $endpoints, $relation_type = NULL, $enforce_direction = FALSE) {
-  $query = Drupal::entityQuery('relation');
-  foreach ($endpoints as $r_index => $endpoint) {
-    relation_query_add_related($query, $endpoint['entity_type'], $endpoint['entity_id'], $enforce_direction ? $r_index : NULL);
-  }
-  if ($relation_type) {
-    $query->condition('relation_type', $relation_type);
-  }
-  $query->condition('arity', count($endpoints));
-
-  // If direction of the relation is not forced make sure the each endpoint
-  // is counted just once.
-  if (!$enforce_direction) {
-    $query->addTag('enforce_distinct_endpoints');
-  }
-  return $query->execute();
-}
-
-/**
  * Implements hook_query_TAG_alter().
  *
  * Adds conditions to query to ensure different r_index for each endpoint.

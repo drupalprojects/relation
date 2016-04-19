@@ -27,7 +27,7 @@ function relation_endpoint_field_validate(EntityInterface $entity, $field, $inst
   // Check if the relation type is unique and if so, check if a relation between
   // those items exist already.
   if ($relation_type->r_unique) {
-    $relation_ids = relation_relation_exists($items, $entity->relation_type);
+    $relation_ids = \Drupal::service('entity.repository.relation')->relationExists($items, $entity->relation_type);
     if ($relation_ids && (!isset($entity->relation_id) || !isset($relation_ids[$entity->relation_id]))) {
       $errors[$field['field_name']][$langcode][0][] = array(
         'error' => 'relation_already_exists',

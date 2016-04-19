@@ -3,12 +3,13 @@
 namespace Drupal\relation\Entity;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\relation\RelationTypeRepositoryInterface;
+use Drupal\Core\Entity\Query\QueryFactory;
+use Drupal\relation\RelationRepositoryInterface;
 
 /**
  * Provides mechanism for retrieving available relations types.
  */
-class RelationTypeRepository implements RelationTypeRepositoryInterface {
+class RelationRepository implements RelationRepositoryInterface {
 
   /**
    * The entity type manager.
@@ -18,13 +19,23 @@ class RelationTypeRepository implements RelationTypeRepositoryInterface {
   protected $entityTypeManager;
 
   /**
-   * Constructs a new RelationTypeRepository.
+   * The entity query.
+   *
+   * @var \Drupal\Core\Entity\Query\QueryFactory
+   */
+  protected $entityQuery;
+
+  /**
+   * Constructs a new RelationRepository.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
+   * @param \Drupal\Core\Entity\Query\QueryFactory $entity_query
+   *   The entity query.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, QueryFactory $entity_query) {
     $this->entityTypeManager = $entity_type_manager;
+    $this->entityQuery = $entity_query;
   }
 
   /**
@@ -53,6 +64,27 @@ class RelationTypeRepository implements RelationTypeRepositoryInterface {
     }
 
     return $available_types;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function relationExists(array $endpoints, $relation_type = NULL, $enforce_direction = FALSE) {
+    $query = $this->entityQuery->get('relation');
+    foreach ($endpoints as $r_index => $endpoint) {
+      relation_query_add_related($query, $endpoint['entity_type'], $endpoint['entity_id'], $enforce_direction ? $r_index : NULL);
+    }
+    if ($relation_type) {
+      $query->condition('relation_type', $relation_type);
+    }
+    $query->condition('arity', count($endpoints));
+
+    // If direction of the relation is not forced make sure the each endpoint
+    // is counted just once.
+    if (!$enforce_direction) {
+      $query->addTag('enforce_distinct_endpoints');
+    }
+    return $query->execute();
   }
 
 }

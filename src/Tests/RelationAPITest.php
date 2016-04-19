@@ -44,28 +44,28 @@ class RelationAPITest extends RelationTestBase {
    * Test relation helper functions.
    */
   public function testRelationHelpers() {
-    // ## Test relation_relation_exists()
+    // ## Test relationExists() method of entity repository relation service.
     // Where relation type is set.
-    $exists = relation_relation_exists($this->endpoints, $this->relation_type_symmetric);
+    $exists = $this->container->get('entity.repository.relation')->relationExists($this->endpoints, $this->relation_type_symmetric);
     $this->verbose(print_r($exists, TRUE));
     $this->assertTrue(isset($exists[$this->relation_id_symmetric]), 'Relation exists.');
 
     // Where relation type is not set.
-    $exists = relation_relation_exists($this->endpoints_4);
+    $exists = $this->container->get('entity.repository.relation')->relationExists($this->endpoints_4);
     $this->assertTrue(isset($exists[$this->relation_id_octopus]), 'Relation exists.');
 
     // Where endpoints does not exist.
     $endpoints_do_not_exist = $this->endpoints;
     $endpoints_do_not_exist[1]['entity_type'] = $this->randomMachineName();
-    $this->assertEqual([], relation_relation_exists($endpoints_do_not_exist, $this->relation_type_symmetric), 'Relation with non-existant endpoint not found.');
+    $this->assertEqual(array(), $this->container->get('entity.repository.relation')->relationExists($endpoints_do_not_exist, $this->relation_type_symmetric), 'Relation with non-existant endpoint not found.');
 
     // Where there are too many endpoints.
     $endpoints_excessive = $this->endpoints;
     $endpoints_excessive[] = ['entity_type' => $this->randomMachineName(), 'entity_id' => 1000];
-    $this->assertEqual([], relation_relation_exists($endpoints_do_not_exist, $this->relation_type_symmetric), 'Relation with too many endpoints not found.');
+    $this->assertEqual(array(), $this->container->get('entity.repository.relation')->relationExists($endpoints_do_not_exist, $this->relation_type_symmetric), 'Relation with too many endpoints not found.');
 
     // Where relation type is invalid.
-    $this->assertEqual([], relation_relation_exists($this->endpoints, $this->randomMachineName()), 'Relation with invalid relation type not found.');
+    $this->assertEqual(array(), $this->container->get('entity.repository.relation')->relationExists($this->endpoints, $this->randomMachineName()), 'Relation with invalid relation type not found.');
 
   }
 
@@ -86,7 +86,7 @@ class RelationAPITest extends RelationTestBase {
       ['entity_type' => 'node', 'entity_id' => $this->node4->id()],
       ['entity_type' => 'node', 'entity_id' => $this->node4->id()],
     ];
-    $exists = relation_relation_exists($endpoints, 'symmetric');
+    $exists = $this->container->get('entity.repository.relation')->relationExists($endpoints, 'symmetric');
     $this->assertTrue(empty($exists), 'node4 is not related to node4.');
 
     // Get relations for node 1, should return 3 relations.
@@ -212,7 +212,7 @@ class RelationAPITest extends RelationTestBase {
     $this->assertFalse(relation_get_related_entity('node', $this->node4->id()), 'The entity was not loaded after the relation was deleted.');
 
     // Test get available relation types .
-    $available_articles = $this->container->get('entity.repository.relation_type')->getAvailable('node', 'article');
+    $available_articles = $this->container->get('entity.repository.relation')->getAvailable('node', 'article');
     $article_labels = [];
     foreach ($available_articles as $relation) {
       $article_labels[] = $relation->label();
@@ -220,7 +220,7 @@ class RelationAPITest extends RelationTestBase {
     // Expect 3 available relation types for node article.
     $this->assertEqual($article_labels, ['directional', 'octopus', 'symmetric']);
 
-    $available_users = $this->container->get('entity.repository.relation_type')->getAvailable('user', '*');
+    $available_users = $this->container->get('entity.repository.relation')->getAvailable('user', '*');
     $user_labels = [];
     foreach ($available_users as $relation) {
       $user_labels[] = $relation->label();
