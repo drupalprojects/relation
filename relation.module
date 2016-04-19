@@ -265,35 +265,41 @@ function relation_entity_delete(EntityInterface $entity) {
     relation_clear_related_entities_cache($entity->endpoints);
   }
 
-  // Delete relations to this entity.
-  $relation_ids = relation_query($entity->getEntityTypeId(), $entity->id())->execute();
-  // IDs of relations to delete.
-  $relations_to_delete = array();
-  foreach (Relation::loadMultiple($relation_ids) as $relation) {
-    // Remove any endpoints pointing to entity.
-    foreach ($relation->endpoints as $key => $endpoint) {
-      if ($endpoint->entity_id == $entity->id() && $endpoint->entity_type == $entity->getEntityTypeId()) {
-        unset($relation->endpoints[$key]);
+  // Check if there is any relation.
+  $relations_exist = \Drupal::entityTypeManager()->getStorage('relation')->getQuery()
+    ->count()
+    ->execute();
+  if ($relations_exist) {
+    // Delete relations to this entity.
+    $relation_ids = relation_query($entity->getEntityTypeId(), $entity->id())->execute();
+    // IDs of relations to delete.
+    $relations_to_delete = array();
+    foreach (Relation::loadMultiple($relation_ids) as $relation) {
+      // Remove any endpoints pointing to entity.
+      foreach ($relation->endpoints as $key => $endpoint) {
+        if ($endpoint->entity_id == $entity->id() && $endpoint->entity_type == $entity->getEntityTypeId()) {
+          unset($relation->endpoints[$key]);
+        }
+      }
+
+      // Check if relation remains valid with regards to arity.
+      $relation_type = RelationType::load($relation->bundle());
+      $arity = count($relation->endpoints);
+      if ($relation_type && ($arity < $relation_type->min_arity)) {
+        // Not valid - delete.
+        array_push($relations_to_delete, $relation->id());
+      }
+      else {
+        // Valid - save.
+        $relation->save();
       }
     }
-
-    // Check if relation remains valid with regards to arity.
-    $relation_type = RelationType::load($relation->bundle());
-    $arity = count($relation->endpoints);
-    if ($relation_type && ($arity < $relation_type->min_arity)) {
-      // Not valid - delete.
-      array_push($relations_to_delete, $relation->id());
+    if (!empty($relations_to_delete)) {
+      $storage_handler = \Drupal::entityTypeManager()->getStorage('relation');
+      $relations = $storage_handler->loadMultiple($relations_to_delete);
+      $storage_handler->delete($relations);
+      \Drupal::logger('relation')->error('Relations @relations have been deleted.', array('@relations' => implode(', ', $relations_to_delete)));
     }
-    else {
-      // Valid - save.
-      $relation->save();
-    }
-  }
-  if (!empty($relations_to_delete)) {
-    $storage_handler = \Drupal::entityTypeManager()->getStorage('relation');
-    $relations = $storage_handler->loadMultiple($relations_to_delete);
-    $storage_handler->delete($relations);
-    \Drupal::logger('relation')->error('Relations @relations have been deleted.', array('@relations' => implode(', ', $relations_to_delete)));
   }
 }
 

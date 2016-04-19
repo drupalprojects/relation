@@ -4,6 +4,7 @@ namespace Drupal\relation\Tests;
 
 use Drupal\Core\Database\Database;
 use Drupal\relation\Entity\Relation;
+use Drupal\relation\Entity\RelationType;
 
 /**
  * Relation UI.
@@ -31,6 +32,7 @@ class RelationUITest extends RelationTestBase {
       'administer relation fields',
       'administer relation form display',
       'administer relation display',
+      'delete any article content',
     );
     $this->web_user = $this->drupalCreateUser($permissions);
     $this->drupalLogin($this->web_user);
@@ -58,6 +60,45 @@ class RelationUITest extends RelationTestBase {
       t('%type is used by @count relation. You can not remove this relation type until you have removed all %type relations.', ['@count' => $num_relations, '%type' => $this->relation_types['symmetric']['label']]),
       'Correct number of relations found (1) for ' . $this->relation_types['symmetric']['label'] . ' relation type.'
     );
+  }
+
+  /**
+   * Tests any entity delete.
+   */
+  public function testEntityDelete() {
+    // Test that there are relation types and relations created.
+    $this->assertTrue(count($this->relation_types));
+    $relation_exist = \Drupal::entityTypeManager()->getStorage('relation')->getQuery()->range(0, 1)->execute();
+    $this->assertTrue($relation_exist);
+
+    // Delete node.
+    $node = $this->node1->id();
+    $this->drupalPostForm("node/$node/delete", array(), t('Delete'));
+    // Test that there is no error thrown.
+    $this->assertText(t('The Article @label has been deleted.', ['@label' => $this->node1->label()]));
+
+    // Delete all relations and relation types.
+    foreach ($this->relation_types as $relation_type) {
+      $relation_ids = \Drupal::entityQuery('relation')->condition('relation_type', $relation_type['id'], '=')->execute();
+      $type_manager = \Drupal::entityTypeManager()->getStorage('relation');
+      $relations = $type_manager->loadMultiple($relation_ids);
+      $type_manager->delete($relations);
+      $relation_type_entity = RelationType::load($relation_type['id']);
+      $relation_type_entity->delete();
+      $this->assertFalse(RelationType::load($relation_type['id']));
+    }
+
+    // Test that there are no relation types and relations.
+    $relation_type_exist = \Drupal::entityTypeManager()->getStorage('relation_type')->getQuery()->count()->execute();
+    $this->assertFalse($relation_type_exist);
+    $relation_exist = \Drupal::entityTypeManager()->getStorage('relation')->getQuery()->count()->execute();
+    $this->assertFalse($relation_exist);
+
+    // Delete another node.
+    $node = $this->node2->id();
+    $this->drupalPostForm("node/$node/delete", array(), t('Delete'));
+    // Test that there is no error thrown.
+    $this->assertText(t('The Article @label has been deleted.', ['@label' => $this->node2->label()]));
   }
 
   /**
