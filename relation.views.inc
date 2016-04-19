@@ -104,7 +104,7 @@ function relation_views_data() {
     'relationship' => array(
       'label' => 'relation author',
       'title' => t('Relation Author'),
-      'base' => 'users',
+      'base' => 'users_field_data',
       'base field' => 'uid',
     ),
   );
@@ -224,7 +224,7 @@ function relation_views_data_alter(&$data) {
     $target_index = $relation_type->directional ? 'target_bundles' : 'source_bundles';
     foreach ($relation_type->source_bundles as $source_bundle) {
       list($source_entity_type) = explode(':', $source_bundle, 2);
-      $source_table = $entity_info[$source_entity_type]->getBaseTable();
+      $source_table = $entity_info[$source_entity_type]->getDataTable();
 
       // Translatable.
       $placeholders = array(
