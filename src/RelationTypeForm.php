@@ -9,6 +9,7 @@ namespace Drupal\relation;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Entity\EntityForm;
+use Drupal\relation\Entity\Relation;
 
 /**
  * Form controller for relation edit form.
@@ -21,6 +22,7 @@ class RelationTypeForm extends EntityForm {
   public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
 
+    /** @var \Drupal\relation\Entity\RelationType $relation_type */
     $relation_type = $this->entity;
     if ($this->operation == 'add') {
       $form['#title'] = $this->t('Add relation type');
@@ -39,22 +41,21 @@ class RelationTypeForm extends EntityForm {
       ),
       '#suffix' => '<div class="clearfix"></div>',
     );
-    $form['labels']['name'] = array(
-    // Use 'name' for /misc/machine-name.js
+    $form['labels']['label'] = array(
       '#type' => 'textfield',
       '#title' => t('Label'),
       '#description' => t('Display name of the relation type. This is also used as the predicate in natural language formatters (ie. if A is related to B, you get "A [label] B")'),
-      '#default_value' => $relation_type->label,
+      '#default_value' => $relation_type->label(),
       '#size' => 40,
       '#required'  => TRUE,
     );
-    $form['labels']['relation_type'] = array(
+    $form['labels']['id'] = array(
       '#type' => 'machine_name',
-      '#default_value' => $relation_type->relation_type,
+      '#default_value' => $relation_type->id(),
       '#maxlength' => 32,
-      '#disabled' => $relation_type->relation_type,
+      '#disabled' => !$relation_type->isNew(),
       '#machine_name' => array(
-        'source' => array('labels', 'name'),
+        'source' => array('labels', 'label'),
         'exists' => '\Drupal\relation\Entity\RelationType::load',
       ),
     );
@@ -63,7 +64,7 @@ class RelationTypeForm extends EntityForm {
       '#size' => 40,
       '#title' => t('Reverse label'),
       '#description'   => t('Reverse label of the relation type. This is used as the predicate by formatters of directional relations, when you need to display the reverse direction (ie. from the target entity to the source entity). If this is not supplied, the forward label is used.'),
-      '#default_value' => $relation_type->reverse_label,
+      '#default_value' => $relation_type->reverseLabel(),
       '#states' => array(
         'visible' => array(
           ':input[name="directional"]' => array('checked' => TRUE),
@@ -199,11 +200,10 @@ class RelationTypeForm extends EntityForm {
    */
   public function save(array $form, FormStateInterface $form_state) {
     $relation_type = $this->entity;
-    $relation_type->label = $form_state->getValue('name');
 
     $save_message = $relation_type->isNew() ?
-      t('The %relation_type relation type has been created.', array('%relation_type' => $relation_type->relation_type)) :
-      t('The %relation_type relation type has been saved.', array('%relation_type' => $relation_type->relation_type));
+      t('The %relation_type relation type has been created.', array('%relation_type' => $relation_type->id())) :
+      t('The %relation_type relation type has been saved.', array('%relation_type' => $relation_type->id()));
     if ($relation_type->save()) {
       drupal_set_message($save_message);
       $form_state->setRedirectUrl($relation_type->urlInfo());

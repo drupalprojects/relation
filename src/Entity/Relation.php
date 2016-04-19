@@ -126,17 +126,6 @@ class Relation extends ContentEntityBase implements RelationInterface {
   /**
    * {@inheritdoc}
    */
-  public function relation_type_label($reverse = FALSE) {
-    $relation_type = RelationType::load($this->bundle());
-    if ($relation_type) {
-      return ($relation_type->directional && $reverse) ? $relation_type->reverse_label : $relation_type->label;
-    }
-    return NULL;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getOwner() {
     return $this->get('uid')->entity;
   }

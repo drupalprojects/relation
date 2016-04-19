@@ -9,6 +9,7 @@ namespace Drupal\relation_entity_collector\Form;
 
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Language\Language;
 use Drupal\Core\Url;
 use Drupal\relation\Entity\RelationType;
 
@@ -257,8 +258,7 @@ class EntityCollector extends FormBase {
       array_multisort($form_state['values']['table']['weight'], SORT_ASC, $relation->endpoints[Language::LANGCODE_NOT_SPECIFIED]);
       $relation->save();
       if ($relation->id()) {
-        $relation_id = $relation->id();
-        $link = l($relation->relation_type->entity->label(), "relation/$relation_id");
+        $link = \Drupal::l($relation->relation_type->entity->label(), "relation/$relation->id()");
         $list = _relation_stored_entity_keys_list();
         $rendered_list = \Drupal::service('renderer')->render($list);
         $t_arguments = array('!link' => $link, '!list' => $rendered_list);

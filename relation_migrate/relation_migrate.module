@@ -109,7 +109,7 @@ function _relation_migrate_validate_type($element, &$form_state, $form) {
     $function = $field_type['module'] . '_relation_migrate_type_target_validate';
     if (function_exists($function)) {
       if (!$function($element, $form_state, $form) || !_relation_migrate_validate_type_source($form_state['input']['relation_migrate_' . $element['#array_parents'][0] . '_fields'], $relation_type)) {
-        form_error($element, t('Relation type %relation_type cannot be used with one of the selected %FieldType fields. <a href="@rel_type_url">Check allowed source/target bundles for the relation type</a>.', array('%relation_type' => $relation_type->label, '%FieldType' => $field_type['label'], '@rel_type_url' => url('admin/structure/relation/manage/' . $relation_type->relation_type . '/edit'))));
+        form_error($element, t('Relation type %relation_type cannot be used with one of the selected %FieldType fields. <a href="@rel_type_url">Check allowed source/target bundles for the relation type</a>.', array('%relation_type' => $relation_type->label(), '%FieldType' => $field_type['label'], '@rel_type_url' => url('admin/structure/relation/manage/' . $relation_type->id() . '/edit'))));
       }
     }
   }

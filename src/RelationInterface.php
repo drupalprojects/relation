@@ -43,16 +43,4 @@ interface RelationInterface extends ContentEntityInterface, EntityChangedInterfa
    */
   public function endpoints();
 
-  /**
-   * Gets the label of the relation type of the given relation.
-   *
-   * @param $reverse
-   *   optional: whether to get the reverse label (boolean).
-   *
-   * @return string|NULL
-   *   The label of the relation type, or NULL if the relation type
-   *   does not exist.
-   */
-  function relation_type_label($reverse = FALSE);
-
 }

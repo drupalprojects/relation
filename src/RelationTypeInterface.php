@@ -25,4 +25,12 @@ interface RelationTypeInterface extends ConfigEntityInterface {
    */
   public function getBundles($direction = NULL);
 
+  /**
+   * Returns a reversed label of this relation type.
+   *
+   * @return string
+   *   A reversed label of this relation type.
+   */
+  public function reverseLabel();
+
 }

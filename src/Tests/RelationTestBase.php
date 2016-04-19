@@ -127,7 +127,7 @@ abstract class RelationTestBase extends WebTestBase {
    */
   protected function createRelationTypes() {
     $this->relation_types['symmetric'] = [
-      'relation_type' => 'symmetric',
+      'id' => 'symmetric',
       'label' => 'symmetric',
       'source_bundles' => [
         'node:article',
@@ -137,35 +137,36 @@ abstract class RelationTestBase extends WebTestBase {
       ],
     ];
     $this->relation_types['directional'] = [
-      'relation_type' => 'directional',
+      'id' => 'directional',
       'label' => 'directional',
+      'reverse_label' => 'reverse_directional',
       'directional' => TRUE,
       'source_bundles' => ['node:*'],
       'target_bundles' => ['node:page'],
     ];
     $this->relation_types['directional_entitysame'] = [
-      'relation_type' => 'directional_entitysame',
+      'id' => 'directional_entitysame',
       'label' => 'directional_entitysame',
       'directional' => TRUE,
       'source_bundles' => ['node:page'],
       'target_bundles' => ['node:page'],
     ];
     $this->relation_types['directional_entitydifferent'] = [
-      'relation_type' => 'directional_entitydifferent',
+      'id' => 'directional_entitydifferent',
       'label' => 'directional_entitydifferent',
       'directional' => TRUE,
       'source_bundles' => ['user:*'],
       'target_bundles' => ['node:page'],
     ];
     $this->relation_types['octopus'] = [
-      'relation_type' => 'octopus',
+      'id' => 'octopus',
       'label' => 'octopus',
       'min_arity' => 3,
       'max_arity' => 5,
       'source_bundles' => ['node:article', 'node:page'],
     ];
     $this->relation_types['unary'] = [
-      'relation_type' => 'unary',
+      'id' => 'unary',
       'label' => 'unary',
       'min_arity' => 1,
       'max_arity' => 1,
@@ -182,7 +183,7 @@ abstract class RelationTestBase extends WebTestBase {
    */
   protected function createRelationSymmetric() {
     // Article 1 <--> Page 4
-    $this->relation_type_symmetric = $this->relation_types['symmetric']['relation_type'];
+    $this->relation_type_symmetric = $this->relation_types['symmetric']['id'];
     $this->relation_id_symmetric = $this->saveRelation($this->relation_type_symmetric, $this->endpoints);
   }
 
@@ -194,7 +195,7 @@ abstract class RelationTestBase extends WebTestBase {
     $this->endpoints_directional = $this->endpoints;
     $this->endpoints_directional[1]['entity_id'] = $this->node3->id();
     $this->endpoints_directional[1]['r_index'] = 1;
-    $this->relation_type_directional = $this->relation_types['directional']['relation_type'];
+    $this->relation_type_directional = $this->relation_types['directional']['id'];
     $this->relation_id_directional = $this->saveRelation($this->relation_type_directional, $this->endpoints_directional);
 
     // Page 3 --> Page 4
@@ -205,7 +206,7 @@ abstract class RelationTestBase extends WebTestBase {
 
     // Page 3 --> Page 4
     $this->endpoints_entitysame[1]['r_index'] = 1;
-    $this->relation_type_directional_entitysame = $this->relation_types['directional_entitysame']['relation_type'];
+    $this->relation_type_directional_entitysame = $this->relation_types['directional_entitysame']['id'];
     $this->saveRelation($this->relation_type_directional_entitysame, $this->endpoints_entitysame);
     // Page 3 --> Page 5
     $this->endpoints_entitysame[1]['entity_id'] = $this->node5->id();
@@ -217,7 +218,7 @@ abstract class RelationTestBase extends WebTestBase {
 
     // User 1 --> Page 3
     $this->endpoints_entitydifferent[1]['r_index'] = 1;
-    $this->relation_type_directional_entitydifferent = $this->relation_types['directional_entitydifferent']['relation_type'];
+    $this->relation_type_directional_entitydifferent = $this->relation_types['directional_entitydifferent']['id'];
     $this->saveRelation($this->relation_type_directional_entitydifferent, $this->endpoints_entitydifferent);
     // User 1 --> Page 4
     $this->endpoints_entitydifferent[1]['entity_id'] = $this->node4->id();
@@ -229,7 +230,7 @@ abstract class RelationTestBase extends WebTestBase {
    */
   protected function createRelationOctopus() {
     // Nodes 1, 2, 3, 4 are related.
-    $this->relation_type_octopus = $this->relation_types['octopus']['relation_type'];
+    $this->relation_type_octopus = $this->relation_types['octopus']['id'];
     $this->relation_id_octopus = $this->saveRelation($this->relation_type_octopus, $this->endpoints_4);
   }
 
@@ -238,7 +239,7 @@ abstract class RelationTestBase extends WebTestBase {
    */
   protected function createRelationUnary() {
     // Page 5 <--> Page 5
-    $this->relation_type_unary = $this->relation_types['unary']['relation_type'];
+    $this->relation_type_unary = $this->relation_types['unary']['id'];
     $this->relation_id_unary = $this->saveRelation($this->relation_type_unary, $this->endpoints_unary);
   }
 

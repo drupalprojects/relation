@@ -45,7 +45,7 @@ class RelationEntityCollectorTest extends RelationTestBase {
     $node1key = 'node:' . $this->node1->id();
     $node3key = 'node:' . $this->node3->id();
 
-    $relation_type = $this->relation_types['symmetric']['relation_type'];
+    $relation_type = $this->relation_types['symmetric']['id'];
     $edit = array(
       "relation_type" => $relation_type,
       "entity_key" => $node1key,

@@ -1,6 +1,7 @@
 <?php
 
 namespace Drupal\relation\Tests;
+use Drupal\relation\Entity\RelationType;
 
 use Drupal\relation\Entity\Relation;
 
@@ -131,8 +132,8 @@ class RelationAPITest extends RelationTestBase {
     // directional and octopus with relation_type().
     $relations = relation_query('node', $this->node1->id());
     $or_condition = $relations->orConditionGroup()
-      ->condition('relation_type', $this->relation_types['directional']['relation_type'])
-      ->condition('relation_type', $this->relation_types['octopus']['relation_type']);
+      ->condition('relation_type', $this->relation_types['directional']['id'])
+      ->condition('relation_type', $this->relation_types['octopus']['id']);
     $relations = $relations->condition($or_condition)
       ->execute();
     $count = count($relations);
@@ -187,11 +188,20 @@ class RelationAPITest extends RelationTestBase {
 
     // Directional.
     // From Parent to Grandparent.
-    $related = relation_get_related_entity('node', $this->node3->id(), $this->relation_types['directional']['relation_type'], 1);
+    $directional_relation_type = RelationType::load($this->relation_types['directional']['id']);
+    $related = relation_get_related_entity('node', $this->node3->id(), $directional_relation_type->id(), 1);
     $this->assertEqual($this->node1->id(), $related->id());
     // From Parent to Child.
-    $related = relation_get_related_entity('node', $this->node3->id(), $this->relation_types['directional']['relation_type'], 0);
+    $related = relation_get_related_entity('node', $this->node3->id(), $directional_relation_type->id(), 0);
     $this->assertEqual($this->node4->id(), $related->id());
+
+    // Test labels.
+    $this->assertEqual($directional_relation_type->label(), 'directional');
+    $this->assertEqual($directional_relation_type->reverseLabel(), 'reverse_directional');
+    $test_relation_type = RelationType::create(['id' => 'test_relation_type']);
+    $test_relation_type->save();
+    $this->assertEqual($test_relation_type->label(), 'test_relation_type');
+    $this->assertEqual($test_relation_type->reverseLabel(), 'test_relation_type');
 
     // Delete all relations related to node 4, then confirm that these can
     // no longer be found as related entities.
@@ -224,7 +234,7 @@ class RelationAPITest extends RelationTestBase {
    */
   public function testRelationSave() {
     foreach ($this->relation_types as $value) {
-      $relation_type = $value['relation_type'];
+      $relation_type = $value['id'];
       $endpoints = $this->endpoints;
       if (isset($value['min_arity'])) {
         $endpoints = $value['min_arity'] == 1 ? $this->endpoints_unary : $this->endpoints_4;

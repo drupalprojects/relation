@@ -59,7 +59,7 @@ class RelationRulesTest extends RelationTestBase {
       $rule = rule();
       $rule->action('entity_create', array(
         'type' => 'relation',
-        'param_relation_type' => $this->relation_types['symmetric']['relation_type'],
+        'param_relation_type' => $this->relation_types['symmetric']['id'],
         'param_author:select' => 'site:current-user',
         'param_endpoints' => $endpoints,
         'entity_created:var' => 'relation',
@@ -82,7 +82,7 @@ class RelationRulesTest extends RelationTestBase {
       $rule->action('entity_fetch', array('type' => 'relation', 'id' => $relation_id));
       $rule->action('entity_create', array(
         'type' => 'relation',
-        'param_relation_type' => $this->relation_types['symmetric']['relation_type'],
+        'param_relation_type' => $this->relation_types['symmetric']['id'],
         'param_author:select' => 'site:current-user',
         // Now, load the endpoints from the fetched relation, into a new
         // relation.

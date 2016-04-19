@@ -1,43 +1,13 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\relation\Entity\RelationType.
- */
-
 namespace Drupal\relation\Entity;
 
-use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
 use Drupal\relation\RelationTypeInterface;
-use Drupal\Core\Annotation\Translation;
-use Drupal\Core\Entity\Annotation\EntityType;
 
 /**
  * Defines relation type entity.
- *
- * Properties.
- *
- *  - relation_type (required): Relation type machine name (string).
- *  - label: Relation type human-readable name (string). Defaults to
- *    duplicating relation_type.
- *  - directional: whether relation is directional (boolean). Defaults to
- *    FALSE.
- *  - transitive: whether relation is transitive (boolean). Defaults to FALSE.
- *  - r_unique: whether relations of this type are unique (boolean). Defaults
- *    to FALSE.
- *  - min_arity: minimum number of entities in relations of this type
- *    (int >= 2). Defaults to 2.
- *  - max_arity: maximum number of entities in relations of this type
- *    (int >= min_arity). Defaults to 2.
- *  - source_bundles: array containing allowed bundle keys. This is used for
- *    both directional and non-directional relations. Bundle key arrays are
- *    of the form 'entity:bundle', eg. 'node:article', or 'entity:*' for all
- *    bundles of the type.
- *  - target_bundles: array containing arrays allowed target bundle keys.
- *    This is the same format as source_bundles, but is only used for
- *    directional relations.
  *
  * @ConfigEntityType(
  *   id = "relation_type",
@@ -57,8 +27,20 @@ use Drupal\Core\Entity\Annotation\EntityType;
  *   config_prefix = "type",
  *   bundle_of = "relation",
  *   entity_keys = {
- *     "id" = "relation_type",
+ *     "id" = "id",
  *     "label" = "label"
+ *   },
+ *   config_export = {
+ *     "id",
+ *     "label",
+ *     "reverse_label",
+ *     "directional",
+ *     "transitive",
+ *     "r_unique",
+ *     "min_arity",
+ *     "max_arity",
+ *     "source_bundles",
+ *     "target_bundles",
  *   },
  *   links = {
  *     "edit-form" = "/admin/structure/relation/manage/{relation_type}",
@@ -74,10 +56,12 @@ class RelationType extends ConfigEntityBundleBase implements RelationTypeInterfa
    *
    * @var string
    */
-  public $relation_type;
+  public $id;
 
   /**
    * The human-readable name of this type.
+   *
+   * Defaults to relation type id.
    *
    * @var string
    */
@@ -114,14 +98,16 @@ class RelationType extends ConfigEntityBundleBase implements RelationTypeInterfa
   public $r_unique  = FALSE;
 
   /**
-   * The minimum number of rows that can make up a relation of this type.
+   * The minimum number of entities that can make up a relation of this type.
    *
    * @var int
    */
   public $min_arity  = 2;
 
   /**
-   * The maximum number of rows that can make up a relation of this type. Similar to field cardinality.
+   * The maximum number of entities that can make up a relation of this type.
+   *
+   * Similar to field cardinality.
    *
    * @var int
    */
@@ -130,12 +116,19 @@ class RelationType extends ConfigEntityBundleBase implements RelationTypeInterfa
   /**
    * List of entity bundles that can be used as relation sources.
    *
+   * This is used for both directional and non-directional relations. Bundle key
+   * arrays are of the form 'entity:bundle', eg. 'node:article', or 'entity:*'
+   * for all bundles of the type.
+   *
    * @var array
    */
   public $source_bundles = array();
 
   /**
    * List of entity bundles that can be used as relation targets.
+   *
+   * This is the same format as source bundles, but is only used for directional
+   * relations.
    *
    * @var array
    */
@@ -144,34 +137,8 @@ class RelationType extends ConfigEntityBundleBase implements RelationTypeInterfa
   /**
    * {@inheritdoc}
    */
-  public function id() {
-    return $this->relation_type;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function label($langcode = NULL) {
-    return $this->label;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function preSave(EntityStorageInterface $storage) {
-    if (!isset($this->relation_type)) {
-      throw new EntityMalformedException('Bundle property must be set on relation_type entities.');
-    }
-
-    if (empty($this->label)) {
-      $this->label = $this->relation_type;
-    }
-
-    // Directional relations should have a reverse label, but if they don't,
-    // or if they are symmetric:
-    if (empty($this->reverse_label)) {
-      $this->reverse_label = $this->label;
-    }
+  public function reverseLabel() {
+    return $this->reverse_label;
   }
 
   /**
@@ -211,6 +178,23 @@ class RelationType extends ConfigEntityBundleBase implements RelationTypeInterfa
       $bundles[$entity_type_id][$bundle] = $bundle;
     }
     return $bundles;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function preSave(EntityStorageInterface $storage) {
+    parent::preSave($storage);
+
+    if (empty($this->label)) {
+      $this->label = $this->id();
+    }
+
+    // Directional relations should have a reverse label. If they are symmetric
+    // or if they don't have it, fill it with the label.
+    if (empty($this->reverse_label)) {
+      $this->reverse_label = $this->label;
+    }
   }
 
 }
