@@ -317,31 +317,40 @@ function relation_add_endpoint_field(RelationTypeInterface $relation_type) {
       'cardinality' => FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED,
       'type' => 'dynamic_entity_reference',
       'locked' => TRUE,
+      'settings' => array(
+        // @TODO DER puts these two here, NOT on the instance. So instead we
+        // need to allow all possible entity types on the field storage entity
+        // as instances are added, and ensure the bundles validation on the
+        // instances is sufficient.
+        'exclude_entity_types' => FALSE,
+        'entity_type_ids' => array(),
+      ),
     ));
     $field->save();
   }
 
   if ($field && empty($instance)) {
-    $settings = array(
-      'exclude_entity_types' => FALSE,
-    );
+    $settings = [];
     // @TODO Handle directional relations differently, if they are going to be
     // supported with DER generally?
-    foreach ($relation_type->getBundles() as $selected_bundle) {
-      list($selected_entity_type, $selected_bundle) = explode(':', $selected_bundle, 2);
-      $settings['entity_type_ids'][$selected_entity_type] = $selected_entity_type;
-      $settings[$selected_entity_type]['handler'] = 'default:' . $selected_entity_type;
+    foreach ($relation_type->getBundles() as $selected_entity_type => $selected_bundles) {
       // @TODO Either patch DER to allow '*' in some way (e.g. allow no bundles
       // to be selected, to mean all bundle), or subscribe to bundle creation &
       // bundle rename events in order to add them then if this setting is *.
-      if ($selected_bundle === '*') {
-        $selected_bundles = \Drupal::service('entity_type.bundle.info')->getBundleInfo($selected_entity_type);
-        foreach (array_keys($selected_bundles) as $target_bundle) {
-          $settings[$selected_entity_type]['handler_settings']['target_bundles'][$target_bundle] = $target_bundle;
+      // Also, default field settings, which will include all existing content
+      // entity types, will be merged with our $settings array, so this will not
+      // sufficiently restrict the allowed entity types. A rethink is therefore
+      // needed.
+      foreach ($selected_bundles as $selected_bundle) {
+        if ($selected_bundle === '*') {
+          $selected_bundles = \Drupal::service('entity_type.bundle.info')->getBundleInfo($selected_entity_type);
+          foreach (array_keys($selected_bundles) as $target_bundle) {
+            $settings[$selected_entity_type]['handler_settings']['target_bundles'][$target_bundle] = $target_bundle;
+          }
         }
-      }
-      else {
-        $settings[$selected_entity_type]['handler_settings']['target_bundles'][$selected_bundle] = $selected_bundle;
+        else {
+          $settings[$selected_entity_type]['handler_settings']['target_bundles'][$selected_bundle] = $selected_bundle;
+        }
       }
     }
 
