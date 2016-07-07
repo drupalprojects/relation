@@ -162,11 +162,11 @@ function relation_query($entity_type = NULL, $entity_id = NULL, $delta = NULL) {
  */
 function relation_query_add_related(QueryInterface $query, $entity_type, $entity_id = NULL, $delta = NULL) {
   $group = $query->andConditionGroup()
-    ->condition('endpoints.entity_type', $entity_type, '=');
+    ->condition('endpoints.target_type', $entity_type, '=');
 
   if (isset($entity_id)) {
     $operator = is_array($entity_id) ? 'IN' : '=';
-    $group->condition('endpoints.entity_id', $entity_id, $operator);
+    $group->condition('endpoints.target_id', $entity_id, $operator);
   }
 
   if (isset($delta)) {
@@ -322,12 +322,35 @@ function relation_add_endpoint_field(RelationTypeInterface $relation_type) {
   }
 
   if ($field && empty($instance)) {
+    $settings = array(
+      'exclude_entity_types' => FALSE,
+    );
+    // @TODO Handle directional relations differently, if they are going to be
+    // supported with DER generally?
+    foreach ($relation_type->getBundles() as $selected_bundle) {
+      list($selected_entity_type, $selected_bundle) = explode(':', $selected_bundle, 2);
+      $settings['entity_type_ids'][$selected_entity_type] = $selected_entity_type;
+      $settings[$selected_entity_type]['handler'] = 'default:' . $selected_entity_type;
+      // @TODO Either patch DER to allow '*' in some way (e.g. allow no bundles
+      // to be selected, to mean all bundle), or subscribe to bundle creation &
+      // bundle rename events in order to add them then if this setting is *.
+      if ($selected_bundle === '*') {
+        $selected_bundles = \Drupal::service('entity_type.bundle.info')->getBundleInfo($selected_entity_type);
+        foreach (array_keys($selected_bundles) as $target_bundle) {
+          $settings[$selected_entity_type]['handler_settings']['target_bundles'][$target_bundle] = $target_bundle;
+        }
+      }
+      else {
+        $settings[$selected_entity_type]['handler_settings']['target_bundles'][$selected_bundle] = $selected_bundle;
+      }
+    }
+
     // Attach field instance.
     $instance = FieldConfig::create(array(
       'field_storage' => $field,
       'bundle' => $relation_type->id(),
       'label' => t('Endpoints'),
-      'settings' => array(),
+      'settings' => $settings,
     ));
     $instance->save();
 

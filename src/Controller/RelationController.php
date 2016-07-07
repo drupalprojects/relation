@@ -47,13 +47,13 @@ class RelationController extends ControllerBase {
 
     // Bypass the relation/add listing if only one relation type is available.
     if (count($relation_types) == 1) {
-      return $this->redirect('relation.add', ['relation_type' => key($relation_types)]);
+      return $this->redirect('entity.relation.add', ['relation_type' => key($relation_types)]);
     }
 
     foreach ($relation_types as $relation_type => $title) {
       $links[] = array(
         'title' => $title,
-        'url' => Url::fromRoute('relation.add', ['relation_type' => $relation_type]),
+        'url' => Url::fromRoute('entity.relation.add', ['relation_type' => $relation_type]),
         'attributes' => array(),
       );
     }
@@ -75,7 +75,7 @@ class RelationController extends ControllerBase {
    */
   public function add(RelationTypeInterface $relation_type) {
     $relation = $this->entityManager()->getStorage('relation')->create(array(
-      'relation_type' => $relation_type->relation_type,
+      'relation_type' => $relation_type->id(),
     ));
 
     $form = $this->entityFormBuilder()->getForm($relation);

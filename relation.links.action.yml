@@ -7,4 +7,4 @@ entity.relation.add_page:
   route_name: entity.relation.add_page
   title: 'Add relation'
   appears_on:
-    - relation.list
+    - entity.relation.collection
