@@ -14,5 +14,7 @@
     "source": "http://git.drupal.org/project/relation.git"
   },
   "license": "GPL-2.0+",
-  "require": {}
+  "require": {
+    "drupal/dynamic_entity_reference": "^8.1@RC"
+  }
 }
