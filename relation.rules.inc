@@ -6,19 +6,15 @@
  */
 
 use Drupal\Core\Language\Language;
+use Drupal\Core\Render\Element;
+use Drupal\relation\Entity\Relation;
+use Drupal\relation\Entity\RelationType;
 
 /**
  * Implements hook_rules_event_info().
  */
 function relation_rules_event_info() {
   return array(
-    'relation_insert' => array(
-      'label' => t('After saving a new relation'),
-      'group' => t('Relation'),
-      'variables' => array(
-        'relation' => array('type' => 'relation', 'label' => t('relation'), 'description' => t('The relation.')),
-      ),
-    ),
     'relation_update' => array(
       'label' => t('After updating a relation'),
       'group' => t('Relation'),
@@ -132,7 +128,8 @@ function relation_rules_get_specific_endpoints($relation, array $options, $prope
 
   $array = array();
   foreach ($endpoints as $endpoint) {
-    $entity = entity_load($endpoint['entity_type'], $endpoint['entity_id']);
+    $storage_handler = \Drupal::entityTypeManager()->getStorage($endpoint['entity_type']);
+    $entity = $storage_handler->load($endpoint['entity_id']);
     $array[] = $entity->id();
   }
   return $array;
@@ -151,7 +148,8 @@ function relation_rules_get_specific_endpoints($relation, array $options, $prope
 function relation_rules_set_endpoints(&$relation = NULL, $name = NULL, $entity_wrappers = NULL) {
   // Check that we are creating a new relation. Updating existing relations
   // aren't supported.
-  if (isset($relation->rid) || empty($entity_wrappers)) {
+  $relation_id = $relation->id();
+  if (isset($relation_id) || empty($entity_wrappers)) {
     return;
   }
 
@@ -183,12 +181,12 @@ function relation_rules_get_related_entities($entity, array $options, $name, $ty
     ->entityCondition('bundle', $info['relation_type'])
     ->range(0, 50)
     ->execute();
-  $rids = array_keys($results);
+  $relation_ids = array_keys($results);
   $entities_ids = array();
-  if (!$rids) {
+  if (!$relation_ids) {
     return $entities_ids;
   }
-  foreach (relation_load_multiple($rids) as $relation) {
+  foreach (Relation::loadMultiple($relation_ids) as $relation) {
     foreach ($relation->endpoints[Language::LANGCODE_NOT_SPECIFIED] as $endpoint) {
       if ($endpoint['entity_type'] == $info['target_type']) {
         $entities_ids[] = $endpoint['entity_id'];
@@ -238,7 +236,7 @@ function relation_rules_load_related_form_alter(&$form, &$form_state, $options, 
 
   if ($first_step) {
     // In the first step only show relevant parameters.
-    foreach (element_children($form['parameter']) as $key) {
+    foreach (Element::children($form['parameter']) as $key) {
       if (($key != 'relation_type') && ($key != 'left')) {
         unset($form['parameter'][$key]);
       }
@@ -300,7 +298,7 @@ function relation_rules_fetch_endpoint_type_options(RulesAbstractPlugin $element
     }
   }
 
-  foreach (entity_load_multiple('relation_type') as $relation_type) {
+  foreach (RelationType::loadMultiple() as $relation_type) {
     // Add the allowed source entity types to the list.
     if (!empty($relation_type->source_bundles)) {
       foreach ($relation_type->source_bundles as $source_bundle) {
@@ -378,7 +376,7 @@ function relation_rules_fetch_endpoint_form_alter(&$form, &$form_state, $options
 
   if ($first_step  || $second_step) {
     // In the first step and second step only show relevant parameters.
-    foreach (element_children($form['parameter']) as $key) {
+    foreach (Element::children($form['parameter']) as $key) {
       if (($key != 'relation') && !($second_step && ($key == 'entity_type'))) {
         unset($form['parameter'][$key]);
       }
@@ -422,7 +420,8 @@ function relation_rules_fetch_endpoint_form_alter(&$form, &$form_state, $options
  */
 function relation_rules_fetch_endpoint($relation, $entity_type, $number = 1) {
   // Make sure we have the fully loaded relation entity.
-  $loaded_relation = relation_load($relation->rid);
+  $loaded_relation = Relation::load($relation->id());
+
   // Load the endpoints.
   $endpoints = field_get_items($loaded_relation, 'endpoints');
 
@@ -437,12 +436,13 @@ function relation_rules_fetch_endpoint($relation, $entity_type, $number = 1) {
     }
   }
   if ($entity_ids) {
-    $return = entity_load($entity_type, $entity_ids);
+    $storage_handler = \Drupal::entityTypeManager()->getStorage($entity_type);
+    $return = $storage_handler->loadMultiple($entity_ids);
     // Return a list unless we are only supposed to return a single entity.
     if (1 == $number) {
       $return = reset($return);
       if (!$return) {
-        throw new RulesEvaluationException('Unable to load relation endpoint of type "@type" for @entity with id "@id".', array('@type' => $entity_type, '@entity' => $relation->relation_type, '@id' => $relation->rid));
+        throw new RulesEvaluationException('Unable to load relation endpoint of type "@type" for @entity with id "@id".', array('@type' => $entity_type, '@entity' => $relation->relation_type, '@id' => $relation->id()));
       }
     }
     return array('endpoint_fetched' => $return);

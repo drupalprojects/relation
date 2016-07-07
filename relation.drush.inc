@@ -4,6 +4,9 @@
  * @file
  * Drush integration for the relation module.
  */
+use Drupal\relation\Entity\Relation;
+
+use Drupal\relation\Entity\RelationType;
 
 /**
  * Implements hook_drush_command().
@@ -63,21 +66,23 @@ function relation_generate_message($message) {
  *   Whether to delete all existing relations before creating new ones.
  *
  * @return
- *   Array of rids of the generated relations.
+ *   Array of relation IDs of the generated relations.
  */
 function relation_generate_relations($number_relations = 10, $relation_types = array(), $kill = FALSE) {
-  $relation_types = entity_load_multiple('relation_type', $relation_types);
+  $relation_types = RelationType::loadMultiple($relation_types);
   if ($kill) {
     foreach ($relation_types as $relation_type) {
       $relation_ids = Drupal::entityQuery('relation')
         ->condition('relation_type', $relation_type->id())
         ->execute();
-      entity_delete_multiple('relation', $relation_ids);
+      $storage_handler = \Drupal::entityTypeManager()->getStorage('relation');
+      $relations = $storage_handler->loadMultiple($relation_ids);
+      $storage_handler->delete($relations);
       relation_generate_message(t('Deleted all @type relations.', array('@type' => $relation_type->label())));
     }
   }
 
-  $new_rids = array();
+  $new_relation_ids = array();
   foreach ($relation_types as $relation_type) {
     $available_types = array();
     foreach ($relation_type->source_bundles as $bundle_key) {
@@ -96,8 +101,8 @@ function relation_generate_relations($number_relations = 10, $relation_types = a
       for ($delta = 0; $delta < $arity; $delta++) {
         $direction = ($relation_type->directional && $delta > 0) ? 'target' : 'source';
         $entity_type = array_rand($available_types[$direction]);
-        $entity_info = \Drupal::entityManager()->getDefinitions($entity_type);
-        $bundles = entity_get_bundles($entity_type);
+        $entity_info = \Drupal::entityTypeManager()->getDefinition($entity_type);
+        $bundles = \Drupal::service('entity_type.bundle.info')->getBundleInfo($entity_type);
         $query = Drupal::entityQuery($entity_type);
 
         if (!in_array('*', $available_types[$direction][$entity_type])) {
@@ -116,8 +121,10 @@ function relation_generate_relations($number_relations = 10, $relation_types = a
           );
         }
       }
-      $relation = relation_insert($relation_type->id(), $endpoints);
-      $new_rids[] = $relation->id();
+      $relation = Relation::create(array('relation_type' => $relation_type->id()));
+      $relation->endpoints = $endpoints;
+      $relation->save();
+      $new_relation_ids[] = $relation->id();
       relation_generate_message(
         \Drupal::translation()->formatPlural(
           $number_relations,
@@ -127,5 +134,5 @@ function relation_generate_relations($number_relations = 10, $relation_types = a
         ), 'ok');
     }
   }
-  return $new_rids;
+  return $new_relation_ids;
 }

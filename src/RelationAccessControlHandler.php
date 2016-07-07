@@ -18,8 +18,8 @@ class RelationAccessControlHandler extends EntityAccessControlHandler {
   /**
    * {@inheritdoc}
    */
-  protected function checkAccess(EntityInterface $entity, $operation, $langcode, AccountInterface $account) {
-    if ($parent = parent::checkAccess($entity, $operation, $langcode, $account)) {
+  protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
+    if ($parent = parent::checkAccess($entity, $operation, $account)) {
       return $parent;
     }
 

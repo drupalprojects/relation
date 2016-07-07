@@ -6,6 +6,8 @@
  */
 
 use Drupal\Core\Language\Language;
+use Drupal\Core\Render\Element;
+use Drupal\user\Entity\User;
 
 /**
  * Implements hook_theme().
@@ -33,7 +35,8 @@ function relation_entity_collector_entity_view_alter(&$build, $entity_type) {
   if ($entity_type == 'relation' && _relation_entity_collector_user_has_access()) {
     $relation = $build['#entity'];
     $text = t('Edit @relation_type endpoints', array('@relation_type' => $relation->relation_type));
-    $build['link']['#markup'] = l($text, "relation_entity_collector/$relation->rid", drupal_get_destination());
+    $relation_id = $relation->id();
+    $build['link']['#markup'] = l($text, "relation_entity_collector/$relation_id", \Drupal::destination()->getAsArray());
   }
 }
 
@@ -117,7 +120,8 @@ function relation_entity_collector_views_post_execute($view) {
         }
       }
       foreach ($ids as $entity_type => $entity_ids) {
-        entity_load($entity_type, $entity_ids);
+        $storage_handler = \Drupal::entityTypeManager()->getStorage($entity_type);
+        $storage_handler->loadMultiple($entity_ids);
       }
     }
   }
@@ -132,11 +136,11 @@ function theme_relation_entity_collector_table($variables) {
   $table['attributes']['id'] = 'relation-entity-collector-table';
   $table['rows'] = array();
   drupal_add_tabledrag($table['attributes']['id'], 'order', 'sibling', 'relation-entity-collector-weight');
-  foreach (element_children($form['weight']) as $key) {
+  foreach (Element::children($form['weight']) as $key) {
     $form['weight'][$key]['#attributes']['class'] = array('relation-entity-collector-weight');
     $data = array($form['remove'][$key]['#entity_key']['entity_label']);
     foreach ($form['#entity_collector_columns'] as $column) {
-      $data[] = drupal_render($form[$column][$key]);
+      $data[] = \Drupal::service('renderer')->render($form[$column][$key]);
     }
     $table['rows'][] = array(
       'data' => $data,
@@ -147,7 +151,10 @@ function theme_relation_entity_collector_table($variables) {
   if ($table['rows']) {
     $output .= theme('table', $table);
   }
-  return $output . drupal_render_children($form);
+  foreach ($form as $form_element) {
+    $output .= \Drupal::service('renderer')->render($form_element);
+  }
+  return $output;
 }
 
 /**
@@ -161,6 +168,6 @@ function relation_entity_collector_preprocess_username($variables) {
     // template_preprocess_node() and user_node_load() doesn't load the user
     // so we do instead. It does not work with modules using render arrays
     // because it is called too late but Views renders early.
-    user_load($variables['account']->uid);
+    User::load($variables['account']->uid);
   }
 }

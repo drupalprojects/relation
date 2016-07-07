@@ -4,7 +4,7 @@ relation.type.*:
   type: config_entity
   label: 'Relation type'
   mapping:
-    relation_type:
+    id:
       type: string
       label: 'Machine-readable name'
     label:

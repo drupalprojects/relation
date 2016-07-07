@@ -6,7 +6,10 @@
  */
 
 namespace Drupal\relation_devel\Form;
+
 use Drupal\Core\Form\FormBase;
+use Drupal\relation\Entity\RelationType;
+use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Provides a form for generating dummy relations.
@@ -22,8 +25,8 @@ class RelationGenerate extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, array &$form_state) {
-    $relation_types = entity_load_multiple('relation_type');
+  public function buildForm(array $form, FormStateInterface $form_state) {
+    $relation_types = RelationType::loadMultiple();
 
     if (empty($relation_types)) {
       $form['explanation']['#markup'] = t("You must create a relation type before you can generate relations.");
@@ -70,14 +73,14 @@ class RelationGenerate extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, array &$form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state) {
     $number = $form_state['values']['relation_number'];
     $relation_types = $form_state['values']['relation_types'];
     $kill = $form_state['values']['relation_kill'];
     include_once drupal_get_path('module', 'relation') . '/relation.drush.inc';
     $relation_types = array_keys(array_filter($relation_types));
     $relation_types = empty($relation_types) ? NULL : $relation_types;
-    $rids = relation_generate_relations($number, $relation_types, $kill);
+    $relation_ids = relation_generate_relations($number, $relation_types, $kill);
   }
 
 }

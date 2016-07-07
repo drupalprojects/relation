@@ -8,11 +8,13 @@
 namespace Drupal\relation;
 
 use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Entity\EntityChangedInterface;
+use Drupal\user\EntityOwnerInterface;
 
 /**
  * Provides an interface defining a Relation entity.
  */
-interface RelationInterface extends ContentEntityInterface {
+interface RelationInterface extends ContentEntityInterface, EntityChangedInterface, EntityOwnerInterface {
 
   /**
    * Filters endpoints by entity type.
@@ -40,19 +42,5 @@ interface RelationInterface extends ContentEntityInterface {
    *   entity IDs of endpoints.
    */
   public function endpoints();
-
-  /**
-   * Gets the label of the relation type of the given relation.
-   *
-   * @param $relation
-   *   A relation object.
-   * @param $reverse
-   *   optional: whether to get the reverse label (boolean).
-   *
-   * @return string|NULL
-   *   The label of the relation type, or NULL if the relation type
-   *   does not exist.
-   */
-  function relation_type_label($reverse = FALSE);
 
 }

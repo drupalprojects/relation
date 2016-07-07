@@ -4,6 +4,9 @@
  * @file
  * Migrations between *reference fields and relations.
  */
+use Drupal\relation\Entity\RelationType;
+
+use Drupal\user\Entity\User;
 
 /**
  * Implements hook_menu().
@@ -63,7 +66,7 @@ function relation_migrate_configuration_form($form, &$form_state) {
         '#element_validate' => array('_relation_migrate_validate_type'),
       );
 
-      $user = user_load(variable_get('relation_migrate_' . $field_type_name . '_user', 1));
+      $user = User::load(variable_get('relation_migrate_' . $field_type_name . '_user', 1));
       $form[$field_type_name]['relation_migrate_' . $field_type_name . '_user'] = array(
         '#type' => 'textfield',
         '#title' => t('User'),
@@ -101,12 +104,12 @@ function _relation_migrate_validate_type($element, &$form_state, $form) {
   if (!empty($form_state['input']['relation_migrate_' . $element['#array_parents'][0] . '_relation_type'])) {
     module_load_include('inc', 'relation_migrate', 'relation_migrate.modules');
     $field_type = field_info_field_types($element['#array_parents'][0]);
-    $relation_type = relation_type_load($form_state['input']['relation_migrate_' . $element['#array_parents'][0] . '_relation_type']);
+    $relation_type = RelationType::load($form_state['input']['relation_migrate_' . $element['#array_parents'][0] . '_relation_type']);
 
     $function = $field_type['module'] . '_relation_migrate_type_target_validate';
     if (function_exists($function)) {
       if (!$function($element, $form_state, $form) || !_relation_migrate_validate_type_source($form_state['input']['relation_migrate_' . $element['#array_parents'][0] . '_fields'], $relation_type)) {
-        form_error($element, t('Relation type %relation_type cannot be used with one of the selected %FieldType fields. <a href="@rel_type_url">Check allowed source/target bundles for the relation type</a>.', array('%relation_type' => $relation_type->label, '%FieldType' => $field_type['label'], '@rel_type_url' => url('admin/structure/relation/manage/' . $relation_type->relation_type . '/edit'))));
+        form_error($element, t('Relation type %relation_type cannot be used with one of the selected %FieldType fields. <a href="@rel_type_url">Check allowed source/target bundles for the relation type</a>.', array('%relation_type' => $relation_type->label(), '%FieldType' => $field_type['label'], '@rel_type_url' => url('admin/structure/relation/manage/' . $relation_type->id() . '/edit'))));
       }
     }
   }

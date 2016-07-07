@@ -7,12 +7,13 @@
 
 namespace Drupal\relation\Entity;
 
+use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\Core\Language\Language;
 use Drupal\relation\RelationInterface;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\user\UserInterface;
 
 /**
  * Defines relation entity.
@@ -35,13 +36,13 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *   },
  *   base_table = "relation",
  *   revision_table = "relation_revision",
- *   uri_callback = "relation_uri",
  *   field_ui_base_route = "entity.relation_type.edit_form",
  *   entity_keys = {
- *     "id" = "rid",
- *     "revision" = "vid",
+ *     "id" = "relation_id",
+ *     "revision" = "revision_id",
  *     "bundle" = "relation_type",
- *     "label" = "rid"
+ *     "label" = "relation_id",
+ *     "uuid" = "uuid"
  *   },
  *   bundle_keys = {
  *     "bundle" = "relation_type"
@@ -58,19 +59,8 @@ use Drupal\Core\Field\BaseFieldDefinition;
  * )
  */
 class Relation extends ContentEntityBase implements RelationInterface {
-  /**
-   * {@inheritdoc}
-   */
-  public function id() {
-    return $this->get('rid')->value;
-  }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getRevisionId() {
-    return $this->get('vid')->value;
-  }
+  use EntityChangedTrait;
 
   /**
    * {@inheritdoc}
@@ -83,23 +73,7 @@ class Relation extends ContentEntityBase implements RelationInterface {
    * {@inheritdoc}
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
-    $fields['rid'] = BaseFieldDefinition::create('integer')
-      ->setLabel(t('Relation ID'))
-      ->setDescription(t('Unique relation id (entity id).'))
-      ->setReadOnly(TRUE)
-      ->setSetting('unsigned', TRUE);
-
-    $fields['vid'] = BaseFieldDefinition::create('integer')
-      ->setLabel(t('Revision ID'))
-      ->setDescription(t('The current {relation_revision}.vid version identifier.'))
-      ->setReadOnly(TRUE)
-      ->setSetting('unsigned', TRUE);
-
-    $fields['relation_type'] = BaseFieldDefinition::create('entity_reference')
-      ->setLabel(t('Relation Type'))
-      ->setDescription(t('Relation type (see relation_type table).'))
-      ->setSetting('target_type', 'relation_type')
-      ->setReadOnly(TRUE);
+    $fields = parent::baseFieldDefinitions($entity_type);
 
     $fields['uid'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('User ID'))
@@ -153,20 +127,31 @@ class Relation extends ContentEntityBase implements RelationInterface {
   /**
    * {@inheritdoc}
    */
-  public function relation_type_label($reverse = FALSE) {
-    $relation_type = relation_type_load($this->bundle());
-    if ($relation_type) {
-      return ($relation_type->directional && $reverse) ? $relation_type->reverse_label : $relation_type->label;
-    }
-    return NULL;
+  public function getOwner() {
+    return $this->get('uid')->entity;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function uuid() {
-    // We don't have uuid (yet at least).
-    return NULL;
+  public function getOwnerId() {
+    return $this->get('uid')->target_id;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setOwnerId($uid) {
+    $this->set('uid', $uid);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setOwner(UserInterface $account) {
+    $this->set('uid', $account->id());
+    return $this;
   }
 
 }

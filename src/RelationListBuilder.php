@@ -40,14 +40,15 @@ class RelationListBuilder extends EntityListBuilder {
   public function buildRow(EntityInterface $entity) {
     $row['label']['data'] = array(
       '#type' => 'link',
-      '#title' => $this->getLabel($entity),
-    ) + $entity->urlInfo()->toRenderArray();
+      '#title' => $entity->label(),
+    ) + $entity->toUrl()->toRenderArray();
 
-    $bundle = entity_load($entity->getEntityType()->getBundleEntityType(), $entity->bundle());
+    $storage_handler = \Drupal::entityTypeManager()->getStorage($entity->getEntityType()->getBundleEntityType());
+    $bundle = $storage_handler->load($entity->bundle());
     $row['relation_type']['data'] = array(
       '#type' => 'link',
-      '#title' => $this->getLabel($bundle),
-    ) + $bundle->urlInfo()->toRenderArray();
+      '#title' => $bundle->label(),
+    ) + $bundle->toUrl()->toRenderArray();
 
     // Sort entities by their type.
     foreach ($entity->endpoints as $endpoint) {
@@ -59,13 +60,14 @@ class RelationListBuilder extends EntityListBuilder {
     $entity_count = 0;
     foreach ($entity->endpoints() as $type => $ids) {
       $entity_count_total += count($ids);
-      $entities = entity_load_multiple($type, $ids);
-      foreach ($ids as $id) {
+      $storage_handler = \Drupal::entityTypeManager()->getStorage($type);
+      $entities = $storage_handler->loadMultiple($ids);
+      foreach ($entities as $endpoint_entity) {
         $entity_count++;
         $relation_entities[] = array(
           '#type' => 'link',
-          '#title' => $this->getLabel($entities[$id]),
-        ) + $entities[$id]->urlInfo()->toRenderArray();
+            '#title' => $endpoint_entity->label(),
+        ) + $endpoint_entity->toUrl()->toRenderArray();
       }
     }
 

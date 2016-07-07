@@ -52,7 +52,8 @@ class views_handler_field_relation_link extends views_handler_field_entity {
   function render_link($relation, $values) {
     if (!$relation->access('view')) {
       $this->options['alter']['make_link'] = TRUE;
-      $this->options['alter']['path'] = "relation/$relation->rid";
+      $relation_id = $relation->id();
+      $this->options['alter']['path'] = "relation/$relation_id";
       $text = !empty($this->options['text']) ? $this->options['text'] : t('View');
       return $text;
     }

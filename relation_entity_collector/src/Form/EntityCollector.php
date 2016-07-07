@@ -9,7 +9,9 @@ namespace Drupal\relation_entity_collector\Form;
 
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Language\Language;
 use Drupal\Core\Url;
+use Drupal\relation\Entity\RelationType;
 
 /**
  * Provides a entity collector form.
@@ -51,7 +53,7 @@ class EntityCollector extends FormBase {
         foreach ($entities as $entity_id => $entity) {
           $entity_bundle = $entity->bundle();
           if ($relation_type) {
-            $relation_type_object = relation_type_load($relation_type);
+            $relation_type_object = RelationType::load($relation_type);
             $valid = FALSE;
             foreach (array('source_bundles', 'target_bundles') as $property) {
               foreach ($relation_type_object->$property as $allowed_bundle) {
@@ -66,7 +68,7 @@ class EntityCollector extends FormBase {
             $valid = TRUE;
           }
           if ($valid) {
-            $bundles = entity_get_bundles($entity_type);
+            $bundles = \Drupal::service('entity_type.bundle.info')->getBundleInfo($entity_type);
             $options["$entity_type:$entity_id"] = $bundles[$entity_bundle]['label'] . ': ' . $entity->label();
           }
         }
@@ -141,7 +143,7 @@ class EntityCollector extends FormBase {
         $form['reload']['table']['#theme'] = 'relation_entity_collector_table';
       }
       if (!isset($relation_type_object) && !empty($relation_type)) {
-        $relation_type_object = relation_type_load($relation_type);
+        $relation_type_object = RelationType::load($relation_type);
       }
       $min_arity = isset($relation_type_object->min_arity) ? $relation_type_object->min_arity : 1;
       if (count($_SESSION['relation_entity_keys']) >= $min_arity) {
@@ -256,9 +258,9 @@ class EntityCollector extends FormBase {
       array_multisort($form_state['values']['table']['weight'], SORT_ASC, $relation->endpoints[Language::LANGCODE_NOT_SPECIFIED]);
       $relation->save();
       if ($relation->id()) {
-        $link = l($relation->relation_type_label(), "relation/$rid");
+        $link = \Drupal::l($relation->relation_type->entity->label(), "relation/$relation->id()");
         $list = _relation_stored_entity_keys_list();
-        $rendered_list = drupal_render($list);
+        $rendered_list = \Drupal::service('renderer')->render($list);
         $t_arguments = array('!link' => $link, '!list' => $rendered_list);
         if (isset($_SESSION['relation_edit'])) {
           $message = t('Edited !link containing !list', $t_arguments);
