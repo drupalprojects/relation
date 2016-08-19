@@ -13,3 +13,4 @@ files[] = views/views_handler_field_relation_link_delete.inc
 files[] = views/views_handler_field_relation_link_edit.inc
 dependencies[] = relation_endpoint
 dependencies[] = system (>=7.33)
+test_dependencies[] = views
