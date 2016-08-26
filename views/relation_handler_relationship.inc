@@ -94,7 +94,8 @@ class relation_handler_relationship extends views_handler_relationship {
     if ($this->definition['directional'] && $this->options['r_index'] > -1) {
       $join->definition['extra'][] = array(
         'field' => $r_index_field_name,
-        'value' => $this->options['r_index'],
+        'operator' => $this->options['r_index'] == 1 ? '=' : '!=',
+        'value' => '1',
       );
     }
     $join->construct();
