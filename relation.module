@@ -616,7 +616,6 @@ function relation_save($relation, $account = NULL) {
   if (!isset($account)) {
     $account = $GLOBALS['user'];
   }
-  global $user;
   try {
     field_attach_validate('relation', $relation);
   }
