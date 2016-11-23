@@ -6,3 +6,5 @@ core: 8.x
 configure: entity.relation_type.collection
 dependencies:
   - relation_endpoint
+test_dependencies:
+  - dynamic_entity_reference
