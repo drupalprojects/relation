@@ -75,8 +75,12 @@ class RelationRulesTestCase extends RelationTestCase {
     // we fetched the endpoits from that relation.
     $correct = ($relation->endpoints[LANGUAGE_NONE][0]['entity_id'] == $node->nid) && ($relation->endpoints[LANGUAGE_NONE][1]['entity_id'] == $user->uid);
     $this->assertTrue($correct, 'Relation was created by fetching endpoints from another relation and saving it.');
+  }
 
-
+  /**
+   * Test that relation options are available in rules admin UIs.
+   */
+  function testRelationInRulesAdmin() {
     // Tests that relation properties are available in rules. So create a new
     // rule with relation action, and check that the text is available among the
     // "Data selectors" list.
@@ -102,6 +106,11 @@ class RelationRulesTestCase extends RelationTestCase {
     $this->drupalPost(NULL, $post, t('Save'));
 
     // Adds action.
+    // Temporary workaround, with taxonomy module enabled this Add action click
+    // link triggers:
+    //   Exception Notice   Trying to get property of non-object
+    //     callbacks.inc      827 entity_metadata_taxonomy_access()
+    module_disable(array('taxonomy'));
     $this->clickLink(t('Add action'));
     $post = array(
       'element_name' => 'relation_rules_load_related',
