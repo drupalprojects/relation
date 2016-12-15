@@ -71,8 +71,8 @@ class RelationRepository implements RelationRepositoryInterface {
    */
   public function relationExists(array $endpoints, $relation_type = NULL, $enforce_direction = FALSE) {
     $query = $this->entityQuery->get('relation');
-    foreach ($endpoints as $r_index => $endpoint) {
-      relation_query_add_related($query, $endpoint['entity_type'], $endpoint['entity_id'], $enforce_direction ? $r_index : NULL);
+    foreach ($endpoints as $delta => $endpoint) {
+      relation_query_add_related($query, $endpoint['target_type'], $endpoint['target_id'], $enforce_direction ? $delta : NULL);
     }
     if ($relation_type) {
       $query->condition('relation_type', $relation_type);

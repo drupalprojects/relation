@@ -20,18 +20,18 @@ use Drupal\field\Entity\FieldStorageConfig;
 class RelationRelationship extends RelationshipStandard {
 
   /**
-   * Define r_index option.
+   * Define delta option.
    */
   public function defineOptions() {
     $options = parent::defineOptions();
-    $options['r_index'] = array('default' => -1);
+    $options['delta'] = array('default' => -1);
     $options['entity_deduplication_left'] = array('default' => FALSE);
     $options['entity_deduplication_right'] = array('default' => FALSE);
     return $options;
   }
 
   /**
-   * Let the user choose r_index.
+   * Let the user choose delta.
    */
   public function buildOptionsForm(&$form, FormStateInterface $form_state) {
     parent::buildOptionsForm($form, $form_state);
@@ -41,7 +41,7 @@ class RelationRelationship extends RelationshipStandard {
     $endpoints_twice = isset($this->definition['entity_type_left']) && isset($this->definition['entity_type_right']);
 
     if ($this->definition['directional']) {
-      $form['r_index'] = array(
+      $form['delta'] = array(
         '#type' => 'select',
         '#options' => array(
           -1 => t('Any'),
@@ -49,7 +49,7 @@ class RelationRelationship extends RelationshipStandard {
           1 => t('Target'),
         ),
         '#title' => t('Position of the relationship base'),
-        '#default_value' => $this->options['r_index'],
+        '#default_value' => $this->options['delta'],
         // check_plain()'d in the definition.
         '#description' => t('Select whether the entity you are adding the relationship to is source or target of @relation_type_label relation.', array('@relation_type_label' => $this->definition['label'])),
       );
@@ -75,10 +75,11 @@ class RelationRelationship extends RelationshipStandard {
     $table_mapping = \Drupal::entityTypeManager()->getStorage('relation')->getTableMapping();
     $endpoints_field = FieldStorageConfig::loadByName('relation', 'endpoints');
 
+    // Get how `endpoint` is stored in the database.
     $relation_data_table_name = $table_mapping->getDedicatedDataTableName($endpoints_field);
-    $entity_id_field_name = $table_mapping->getFieldColumnName($endpoints_field, 'entity_id');
-    $entity_type_field_name = $table_mapping->getFieldColumnName($endpoints_field, 'entity_type');
-    $r_index_field_name = $table_mapping->getFieldColumnName($endpoints_field, 'r_index');
+    $entity_id_field_name = $table_mapping->getFieldColumnName($endpoints_field, 'target_id');
+    $entity_type_field_name = $table_mapping->getFieldColumnName($endpoints_field, 'target_type');
+    $delta_field_name = $table_mapping->getFieldColumnName($endpoints_field, 'delta');
 
     $join_type = empty($this->options['required']) ? 'LEFT' : 'INNER';
     $endpoints_twice = isset($this->definition['entity_type_left']) && isset($this->definition['entity_type_right']);
@@ -113,11 +114,10 @@ class RelationRelationship extends RelationshipStandard {
       // The left table is relation.
       $configuration['field'] = 'entity_id';
     }
-
-    if ($this->definition['directional'] && $this->options['r_index'] > -1) {
+    if ($this->definition['directional'] && $this->options['delta'] > -1) {
       $configuration['extra'][] = array(
-        'field' => $r_index_field_name,
-        'value' => $this->options['r_index'],
+        'field' => $delta_field_name,
+        'value' => $this->options['delta'],
       );
     }
 
@@ -146,7 +146,7 @@ class RelationRelationship extends RelationshipStandard {
         $configuration['extra'][] = array(
           // This definition is a bit funny but there's no other way to tell
           // Views to use an expression in join extra as it is.
-          'field' => $r_index_field_name . ' !=  ' . $l . '.' . $r_index_field_name . ' AND 1',
+          'field' => $delta_field_name . ' !=  ' . $l . '.' . $delta_field_name . ' AND 1',
           'value' => 1,
         );
       }

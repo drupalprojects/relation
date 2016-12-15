@@ -164,7 +164,7 @@ function relation_rules_set_endpoints(&$relation = NULL, $name = NULL, $entity_w
         'entity_type' => $entity_wrapper->type(),
         'entity_id' => $entity->{$id_key},
         'entity_bundle' => isset($entity->{$bundle_key}) ? $entity->{$bundle_key} : $entity_type,
-        'r_index' => $i,
+        'delta' => $i,
       );
     }
   }

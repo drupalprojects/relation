@@ -34,7 +34,7 @@ class EntityCollectorController extends ControllerBase {
         'entity_type' => $endpoint['entity_type'],
         'entity_id' => $endpoint['entity_id'],
         'entity_bundle' => $entity_bundle,
-        'r_index' => $delta,
+        'delta' => $delta,
         'entity_label' => "$entity_bundle: " . entity_label($endpoint['entity_type'], $entity),
         'entity_key' => $endpoint['entity_type'] . ':' . $endpoint['entity_id'],
       );

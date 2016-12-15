@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\relation\RelationListBuilder.
- */
-
 namespace Drupal\relation;
 
 use Drupal\Core\Entity\EntityInterface;
@@ -50,19 +45,14 @@ class RelationListBuilder extends EntityListBuilder {
       '#title' => $bundle->label(),
     ) + $bundle->toUrl()->toRenderArray();
 
-    // Sort entities by their type.
-    foreach ($entity->endpoints as $endpoint) {
-      $entities[$endpoint->entity_type][] = $endpoint->entity_id;
-    }
-
     $relation_entities = array();
     $entity_count_total = 0;
     $entity_count = 0;
-    foreach ($entities as $type => $ids) {
-      $entity_count_total += count(array_unique($ids));
+    foreach ($entity->endpoints() as $type => $ids) {
+      $entity_count_total += count($ids);
       $storage_handler = \Drupal::entityTypeManager()->getStorage($type);
-      $endpoint_entities = $storage_handler->loadMultiple($ids);
-      foreach ($endpoint_entities as $endpoint_entity) {
+      $entities = $storage_handler->loadMultiple($ids);
+      foreach ($entities as $endpoint_entity) {
         $entity_count++;
         $relation_entities[] = array(
           '#type' => 'link',

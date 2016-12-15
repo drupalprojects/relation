@@ -98,8 +98,8 @@ function relation_generate_relations($number_relations = 10, $relation_types = a
     for ($i = $number_relations; $i > 0; $i--) {
       // Start new relation.
       $endpoints = array();
-      for ($r_index = 0; $r_index < $arity; $r_index++) {
-        $direction = ($relation_type->directional && $r_index > 0) ? 'target' : 'source';
+      for ($delta = 0; $delta < $arity; $delta++) {
+        $direction = ($relation_type->directional && $delta > 0) ? 'target' : 'source';
         $entity_type = array_rand($available_types[$direction]);
         $entity_info = \Drupal::entityTypeManager()->getDefinition($entity_type);
         $bundles = \Drupal::service('entity_type.bundle.info')->getBundleInfo($entity_type);
@@ -117,7 +117,7 @@ function relation_generate_relations($number_relations = 10, $relation_types = a
           $endpoints[] = array(
             'entity_type' => $entity_type,
             'entity_id'   => $results[$key],
-            'r_index'     => $r_index,
+            'delta'     => $delta,
           );
         }
       }

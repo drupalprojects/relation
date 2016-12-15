@@ -205,7 +205,7 @@ class EntityCollector extends FormBase {
         $next_index = count($_SESSION['relation_entity_keys']);
         // If validation succeeds we will add this in the submit handler.
         $form_state['pick'] = array(
-          'r_index'       => $next_index,
+          'delta'       => $next_index,
           'entity_key'    => $entity_key,
           'entity_label'  => $entity_label,
           'entity_type'   => $entity_type,

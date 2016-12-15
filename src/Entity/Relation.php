@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\relation\Entity\Relation.
- */
-
 namespace Drupal\relation\Entity;
 
 use Drupal\Core\Entity\EntityChangedTrait;
@@ -33,6 +28,10 @@ use Drupal\user\UserInterface;
  *       "edit" = "Drupal\relation\RelationForm",
  *       "delete" = "Drupal\relation\Form\RelationDeleteConfirm"
  *     },
+ *     "route_provider" = {
+ *       "html" = "Drupal\Core\Entity\Routing\AdminHtmlRouteProvider",
+ *     },
+ *     "views_data" = "Drupal\views\EntityViewsData",
  *   },
  *   base_table = "relation",
  *   revision_table = "relation_revision",
@@ -48,6 +47,8 @@ use Drupal\user\UserInterface;
  *     "bundle" = "relation_type"
  *   },
  *   links = {
+ *     "add-page" = "/relation/add",
+ *     "add-form" = "/relation/add/{relation_type}",
  *     "canonical" = "/relation/{relation}",
  *     "edit-form" = "/relation/{relation}/edit",
  *     "delete-form" = "/relation/{relation}/delete",
@@ -117,7 +118,7 @@ class Relation extends ContentEntityBase implements RelationInterface {
     $entities = array();
 
     foreach ($this->endpoints as $endpoint) {
-      $entities[$endpoint->entity_type][$endpoint->entity_id] = $endpoint->entity_type;
+      $entities[$endpoint->target_type][] = $endpoint->target_id;
     }
 
     return $entities;

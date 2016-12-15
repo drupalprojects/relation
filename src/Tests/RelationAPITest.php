@@ -1,8 +1,9 @@
 <?php
 
 namespace Drupal\relation\Tests;
-use Drupal\relation\Entity\RelationType;
 
+use Drupal\Console\Bootstrap\Drupal;
+use Drupal\relation\Entity\RelationType;
 use Drupal\relation\Entity\Relation;
 
 /**
@@ -14,6 +15,11 @@ use Drupal\relation\Entity\Relation;
  * @group Relation
  */
 class RelationAPITest extends RelationTestBase {
+
+  /**
+   * {@inheritdoc}
+   */
+  public static $modules = ['taxonomy'];
 
   /**
    * {@inheritdoc}
@@ -56,12 +62,12 @@ class RelationAPITest extends RelationTestBase {
 
     // Where endpoints does not exist.
     $endpoints_do_not_exist = $this->endpoints;
-    $endpoints_do_not_exist[1]['entity_type'] = $this->randomMachineName();
+    $endpoints_do_not_exist[1]['target_type'] = $this->randomMachineName();
     $this->assertEqual(array(), $this->container->get('entity.repository.relation')->relationExists($endpoints_do_not_exist, $this->relation_type_symmetric), 'Relation with non-existant endpoint not found.');
 
     // Where there are too many endpoints.
     $endpoints_excessive = $this->endpoints;
-    $endpoints_excessive[] = ['entity_type' => $this->randomMachineName(), 'entity_id' => 1000];
+    $endpoints_excessive[] = ['target_type' => $this->randomMachineName(), 'target_id' => 1000];
     $this->assertEqual(array(), $this->container->get('entity.repository.relation')->relationExists($endpoints_do_not_exist, $this->relation_type_symmetric), 'Relation with too many endpoints not found.');
 
     // Where relation type is invalid.
@@ -78,13 +84,13 @@ class RelationAPITest extends RelationTestBase {
     $relations = Relation::loadMultiple(array_keys(relation_query('node', $this->node1->id())->execute()));
 
     // Check that symmetric relation is correctly related to node 4.
-    $this->assertEqual($relations[$this->relation_id_symmetric]->endpoints[1]->entity_id, $this->node4->id(), 'Correct entity is related: ' . $relations[$this->relation_id_symmetric]->endpoints[1]->entity_id . '==' . $this->node4->id());
+    $this->assertEqual($relations[$this->relation_id_symmetric]->endpoints[1]->target_id, $this->node4->id(), 'Correct entity is related: ' . $relations[$this->relation_id_symmetric]->endpoints[1]->target_id . '==' . $this->node4->id());
 
     // Symmetric relation is Article 1 <--> Page 4
     // @see https://drupal.org/node/1760026
     $endpoints = [
-      ['entity_type' => 'node', 'entity_id' => $this->node4->id()],
-      ['entity_type' => 'node', 'entity_id' => $this->node4->id()],
+      ['target_type' => 'node', 'target_id' => $this->node4->id()],
+      ['target_type' => 'node', 'target_id' => $this->node4->id()],
     ];
     $exists = $this->container->get('entity.repository.relation')->relationExists($endpoints, 'symmetric');
     $this->assertTrue(empty($exists), 'node4 is not related to node4.');
@@ -113,7 +119,7 @@ class RelationAPITest extends RelationTestBase {
     $this->assertFalse($count);
 
     // Get directed relations for node 3 using index, should return 2 relations.
-    // The other node 3 relation has an r_index 0.
+    // The other node 3 relation has a delta 0.
     $relations = relation_query('node', $this->node3->id(), 1)
       ->execute();
     $this->assertEqual(count($relations), 3);
@@ -251,12 +257,12 @@ class RelationAPITest extends RelationTestBase {
       $this->assertEqual($relation->arity->value, count($endpoints));
       $this->assertEqual($relation->bundle(), $relation_type);
       foreach ($relation->endpoints as $endpoint) {
-        $need_ids[$endpoint->entity_id] = TRUE;
+        $need_ids[$endpoint->target_id] = TRUE;
       }
       foreach ($relation->endpoints as $delta => $endpoint) {
-        $this->assertEqual($endpoint->entity_type, $endpoints[$delta]['entity_type'], 'The entity type is ' . $endpoints[$delta]['entity_type'] . ': ' . $endpoint->entity_type);
-        $this->assertTrue(isset($need_ids[$endpoint->entity_id]), 'The entity ID is correct: ' . $need_ids[$endpoint->entity_id]);
-        unset($need_ids[$endpoint->entity_id]);
+        $this->assertEqual($endpoint->target_type, $endpoints[$delta]['target_type'], 'The entity type is ' . $endpoints[$delta]['target_type'] . ': ' . $endpoint->target_type);
+        $this->assertTrue(isset($need_ids[$endpoint->target_id]), 'The entity ID is correct: ' . $need_ids[$endpoint->target_id]);
+        unset($need_ids[$endpoint->target_id]);
       }
       $this->assertFalse($need_ids, 'All ids found.');
       // Confirm the relation_id in revision table.
@@ -309,6 +315,54 @@ class RelationAPITest extends RelationTestBase {
     $second_revision = $this->container->get('entity_type.manager')->getStorage('relation')->loadRevision($relation->getRevisionId());
     $this->assertNotIdentical($first_revision->revision_uid, $second_revision->revision_uid, 'Each revision has a distinct user.');
     */
+  }
+
+  /**
+   * Tests endpoints field validation.
+   */
+  public function testEndpointsFieldValidation() {
+    \Drupal::entityTypeManager()->getStorage('relation_type')->create([
+      'id' => 'test_relation_type',
+      'label' => 'Test relation type',
+      'source_bundles' => [
+        'node:article',
+      ],
+    ])->save();
+    $relation = \Drupal::entityTypeManager()->getStorage('relation')->create([
+      'relation_type' => 'test_relation_type',
+    ]);
+    $relation->save();
+    // Create relation with article node type.
+    $relation->endpoints = [['target_type' => 'node', 'target_id' => $this->node1->id()]];
+    $violations = $relation->endpoints->validate();
+    $this->assertEqual(count($violations), 0, 'Allowed source bundle passed validation.');
+    // Create relation with page node type.
+    $relation->endpoints = [['target_type' => 'node', 'target_id' => $this->node3->id()]];
+    $violations = $relation->endpoints->validate();
+    $this->assertEqual(count($violations), 1);
+    $this->assertEqual($violations[0]->getMessage(), t('Referenced entity %label does not belong to one of the supported bundles (%bundles).', [
+      '%label' => $this->node3->label(),
+      '%bundles' => 'article',
+    ]), 'Not allowed source bundle failed validation.');
+
+    // Test endpoints with unsupported entity type.
+    $vocabulary = \Drupal::entityTypeManager()->getStorage('taxonomy_vocabulary')->create([
+      'vid' => 'test_vocabulary',
+      'name' => $this->randomMachineName(),
+    ]);
+    $vocabulary->save();
+    $term = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->create([
+      'name' => $this->randomMachineName(),
+      'vid' => $vocabulary->id(),
+    ]);
+    $term->save();
+
+    $relation->endpoints = [['target_type' => 'taxonomy_term', 'target_id' => $term->id()]];
+    $violations = $relation->endpoints->validate();
+    $this->assertEqual(count($violations), 1);
+    $this->assertEqual($violations[0]->getMessage(), t('No bundle is allowed for (%type)', [
+      '%type' => 'taxonomy_term',
+    ]), 'Not allowed entity failed validation.');
   }
 
 }

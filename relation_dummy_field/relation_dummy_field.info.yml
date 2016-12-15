@@ -1,7 +1,0 @@
-name: 'Relation Dummy Field'
-type: module
-description: 'Dummy field to display relation data inline on entities.'
-package: Relation
-core: 8.x
-dependencies:
-  - relation

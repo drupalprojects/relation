@@ -17,11 +17,10 @@ abstract class RelationTestBase extends WebTestBase {
   public static $modules = [
     'node',
     'relation',
-    'relation_endpoint',
+    'dynamic_entity_reference',
     'field',
     'field_ui',
     'block',
-    'relation_dummy_field',
   ];
 
   protected $sleep = FALSE;
@@ -100,25 +99,25 @@ abstract class RelationTestBase extends WebTestBase {
    */
   protected function createRelationEndPoints() {
     $this->endpoints = [
-      ['entity_type' => 'node', 'entity_id' => $this->node1->id()],
-      ['entity_type' => 'node', 'entity_id' => $this->node4->id()],
+      ['target_type' => 'node', 'target_id' => $this->node1->id()],
+      ['target_type' => 'node', 'target_id' => $this->node4->id()],
     ];
     $this->endpoints_4 = [
-      ['entity_type' => 'node', 'entity_id' => $this->node1->id()],
-      ['entity_type' => 'node', 'entity_id' => $this->node2->id()],
-      ['entity_type' => 'node', 'entity_id' => $this->node3->id()],
-      ['entity_type' => 'node', 'entity_id' => $this->node4->id()],
+      ['target_type' => 'node', 'target_id' => $this->node1->id()],
+      ['target_type' => 'node', 'target_id' => $this->node2->id()],
+      ['target_type' => 'node', 'target_id' => $this->node3->id()],
+      ['target_type' => 'node', 'target_id' => $this->node4->id()],
     ];
     $this->endpoints_entitysame = [
-      ['entity_type' => 'node', 'entity_id' => $this->node3->id()],
-      ['entity_type' => 'node', 'entity_id' => $this->node4->id()],
+      ['target_type' => 'node', 'target_id' => $this->node3->id()],
+      ['target_type' => 'node', 'target_id' => $this->node4->id()],
     ];
     $this->endpoints_entitydifferent = [
-      ['entity_type' => 'user', 'entity_id' => $this->user1->id()],
-      ['entity_type' => 'node', 'entity_id' => $this->node3->id()],
+      ['target_type' => 'user', 'target_id' => $this->user1->id()],
+      ['target_type' => 'node', 'target_id' => $this->node3->id()],
     ];
     $this->endpoints_unary = [
-      ['entity_type' => 'node', 'entity_id' => $this->node5->id()],
+      ['target_type' => 'node', 'target_id' => $this->node5->id()],
     ];
   }
 
@@ -193,35 +192,35 @@ abstract class RelationTestBase extends WebTestBase {
   protected function createRelationDirectional() {
     // Article 1 --> Page 3
     $this->endpoints_directional = $this->endpoints;
-    $this->endpoints_directional[1]['entity_id'] = $this->node3->id();
-    $this->endpoints_directional[1]['r_index'] = 1;
+    $this->endpoints_directional[1]['target_id'] = $this->node3->id();
+    $this->endpoints_directional[1]['delta'] = 1;
     $this->relation_type_directional = $this->relation_types['directional']['id'];
     $this->relation_id_directional = $this->saveRelation($this->relation_type_directional, $this->endpoints_directional);
 
     // Page 3 --> Page 4
     $this->endpoints_directional2 = $this->endpoints;
-    $this->endpoints_directional2[0]['entity_id'] = $this->node3->id();
-    $this->endpoints_directional2[1]['entity_id'] = $this->node4->id();
+    $this->endpoints_directional2[0]['target_id'] = $this->node3->id();
+    $this->endpoints_directional2[1]['target_id'] = $this->node4->id();
     $this->saveRelation($this->relation_type_directional, $this->endpoints_directional2);
 
     // Page 3 --> Page 4
-    $this->endpoints_entitysame[1]['r_index'] = 1;
+    $this->endpoints_entitysame[1]['delta'] = 1;
     $this->relation_type_directional_entitysame = $this->relation_types['directional_entitysame']['id'];
     $this->saveRelation($this->relation_type_directional_entitysame, $this->endpoints_entitysame);
     // Page 3 --> Page 5
-    $this->endpoints_entitysame[1]['entity_id'] = $this->node5->id();
+    $this->endpoints_entitysame[1]['target_id'] = $this->node5->id();
     $this->saveRelation($this->relation_type_directional_entitysame, $this->endpoints_entitysame);
     // Page 4 --> Page 3
-    $this->endpoints_entitysame[0]['entity_id'] = $this->node4->id();
-    $this->endpoints_entitysame[1]['entity_id'] = $this->node3->id();
+    $this->endpoints_entitysame[0]['target_id'] = $this->node4->id();
+    $this->endpoints_entitysame[1]['target_id'] = $this->node3->id();
     $this->saveRelation($this->relation_type_directional_entitysame, $this->endpoints_entitysame);
 
     // User 1 --> Page 3
-    $this->endpoints_entitydifferent[1]['r_index'] = 1;
+    $this->endpoints_entitydifferent[1]['delta'] = 1;
     $this->relation_type_directional_entitydifferent = $this->relation_types['directional_entitydifferent']['id'];
     $this->saveRelation($this->relation_type_directional_entitydifferent, $this->endpoints_entitydifferent);
     // User 1 --> Page 4
-    $this->endpoints_entitydifferent[1]['entity_id'] = $this->node4->id();
+    $this->endpoints_entitydifferent[1]['target_id'] = $this->node4->id();
     $this->saveRelation($this->relation_type_directional_entitydifferent, $this->endpoints_entitydifferent);
   }
 

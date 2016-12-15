@@ -41,7 +41,7 @@ interface RelationRepositoryInterface {
    * @param array $endpoints
    *   An array containing endpoints. Each endpoint is an array with keys
    *   'entity_type' and 'entity_id'. The keys of each endpoint correspond to
-   *   'r_index' if $enforce_direction is TRUE.
+   *   'delta' if $enforce_direction is TRUE.
    * @param string $relation_type
    *   (Optional) The relation type (bundle) of the relation to be checked.
    * @param bool $enforce_direction

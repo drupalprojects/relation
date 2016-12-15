@@ -2,6 +2,7 @@
 
 namespace Drupal\relation\Entity;
 
+use Drupal\Core\Entity\EntityDescriptionInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
 use Drupal\relation\RelationTypeInterface;
@@ -22,6 +23,9 @@ use Drupal\relation\RelationTypeInterface;
  *       "edit" = "Drupal\relation\RelationTypeForm",
  *       "delete" = "Drupal\relation\Form\RelationTypeDeleteConfirm"
  *     },
+ *     "route_provider" = {
+ *       "html" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
+ *     }
  *   },
  *   admin_permission = "administer relation types",
  *   config_prefix = "type",
@@ -43,13 +47,14 @@ use Drupal\relation\RelationTypeInterface;
  *     "target_bundles",
  *   },
  *   links = {
+ *     "add-form" = "/admin/structure/relation/add",
  *     "edit-form" = "/admin/structure/relation/manage/{relation_type}",
  *     "delete-form" = "/admin/structure/relation/manage/{relation_type}/delete",
  *     "collection" = "/admin/structure/relation",
  *   }
  * )
  */
-class RelationType extends ConfigEntityBundleBase implements RelationTypeInterface {
+class RelationType extends ConfigEntityBundleBase implements RelationTypeInterface, EntityDescriptionInterface {
 
   /**
    * The machine name of this relation type.
@@ -135,10 +140,32 @@ class RelationType extends ConfigEntityBundleBase implements RelationTypeInterfa
   public $target_bundles = array();
 
   /**
+   * A brief description of this relation type.
+   *
+   * @var string
+   */
+  public $description;
+
+  /**
    * {@inheritdoc}
    */
   public function reverseLabel() {
     return $this->reverse_label;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getDescription() {
+    return $this->description;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setDescription($description) {
+    $this->description = $description;
+    return $this;
   }
 
   /**

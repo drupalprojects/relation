@@ -12,7 +12,7 @@ use Drupal\relation\Tests\RelationTestBase;
  * @group Relation
  */
 class RelationEntityCollectorTest extends RelationTestBase {
-  public static $modules = ['relation_entity_collector'];
+  public static $modules = ['node', 'relation_entity_collector'];
 
   /**
    * {@inheritdoc}

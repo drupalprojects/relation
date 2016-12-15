@@ -1,7 +1,0 @@
-name: 'Relation Endpoints Field'
-type: module
-description: 'Helper module for Relation. Defines endpoints field (not usable except by relation).'
-package: Relation
-core: 8.x
-dependencies:
-  - field

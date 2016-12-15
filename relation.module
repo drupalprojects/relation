@@ -78,7 +78,7 @@ function relation_get_relation_types_options() {
 /**
  * Implements hook_query_TAG_alter().
  *
- * Adds conditions to query to ensure different r_index for each endpoint.
+ * Adds conditions to query to ensure different delta for each endpoint.
  */
 function relation_query_enforce_distinct_endpoints_alter(AlterableInterface $query) {
   $arity = 0;
@@ -91,13 +91,13 @@ function relation_query_enforce_distinct_endpoints_alter(AlterableInterface $que
       break;
     }
   }
-  // Add r_index conditions between all endpoints.
+  // Add delta conditions between all endpoints
   for ($i = 0; $i < $arity; $i++) {
     for ($k = $i + 1; $k < $arity; $k++) {
       $left_suffix = !$i ? '' : '_' . ($i + 1);
-      $right_suffix = !$k ? '' : '_' . ($k + 1);
-      $column_left = 'relation__endpoints' . $left_suffix . '.endpoints_r_index';
-      $column_right = 'relation__endpoints' . $right_suffix . '.endpoints_r_index';
+      $right_suffix = !$k  ? '' : '_' . ($k + 1);
+      $column_left = 'relation__endpoints' . $left_suffix . '.delta';
+      $column_right = 'relation__endpoints' . $right_suffix . '.delta';
       $query->where("$column_left != $column_right");
     }
   }
@@ -113,7 +113,7 @@ function relation_query_enforce_distinct_endpoints_alter(AlterableInterface $que
 function relation_clear_related_entities_cache(FieldItemListInterface $endpoints) {
   drupal_static_reset('relation_get_related_entity');
   foreach ($endpoints as $endpoint) {
-    \Drupal::cache()->delete('relation:' . $endpoint->entity_type . ':' . $endpoint->entity_id, 'cache', TRUE);
+    \Drupal::cache()->delete('relation:' . $endpoint->target_type . ':' . $endpoint->target_id, 'cache', TRUE);
   }
 }
 
@@ -125,7 +125,7 @@ function relation_clear_related_entities_cache(FieldItemListInterface $endpoints
  * @param int|null $entity_id
  *   (optional) The entity id of one of the endpoints. Can also be an array of
  *   entity IDs.
- * @param int|null $r_index
+ * @param int|null $delta
  *   (optional) The index of the search entity in the relation to be found
  *   (0 = source, 1 = target).
  *
@@ -134,10 +134,10 @@ function relation_clear_related_entities_cache(FieldItemListInterface $endpoints
  *
  * @todo deprecate this
  */
-function relation_query($entity_type = NULL, $entity_id = NULL, $r_index = NULL) {
+function relation_query($entity_type = NULL, $entity_id = NULL, $delta = NULL) {
   $query = Drupal::entityQuery('relation');
   if ($entity_type) {
-    relation_query_add_related($query, $entity_type, $entity_id, $r_index);
+    relation_query_add_related($query, $entity_type, $entity_id, $delta);
   }
   return $query;
 }
@@ -151,7 +151,7 @@ function relation_query($entity_type = NULL, $entity_id = NULL, $r_index = NULL)
  *   Entity type of the related entity.
  * @param int $entity_id
  *   (optional) Entity id of the related entity. Can be an array of entity IDs.
- * @param int|null $r_index
+ * @param int|null $delta
  *   (optional) The index of the related entity within the requested
  *   relation(s).
  *
@@ -160,17 +160,17 @@ function relation_query($entity_type = NULL, $entity_id = NULL, $r_index = NULL)
  * @return Drupal\Core\Entity\Query\QueryInterface
  *   The query object
  */
-function relation_query_add_related(QueryInterface $query, $entity_type, $entity_id = NULL, $r_index = NULL) {
+function relation_query_add_related(QueryInterface $query, $entity_type, $entity_id = NULL, $delta = NULL) {
   $group = $query->andConditionGroup()
-    ->condition('endpoints.entity_type', $entity_type, '=');
+    ->condition('endpoints.%delta.target_type', $entity_type, '=');
 
   if (isset($entity_id)) {
     $operator = is_array($entity_id) ? 'IN' : '=';
-    $group->condition('endpoints.entity_id', $entity_id, $operator);
+    $group->condition('endpoints.%delta.target_id', $entity_id, $operator);
   }
 
-  if (isset($r_index)) {
-    $group->condition('endpoints.r_index', $r_index, '=');
+  if (isset($delta)) {
+    $group->condition('endpoints.%delta', $delta, '=');
   }
 
   $query->condition($group);
@@ -191,21 +191,21 @@ function relation_query_add_related(QueryInterface $query, $entity_type, $entity
  *   The entity id of one of the endpoints.
  * @param string|null $relation_type
  *   (optional) The relation type of the relation to find.
- * @param int|null $r_index
+ * @param int|null $delta
  *   (optional) The index of the search entity in the relation to be found
  *   (0 = source, 1 = target).
  *
- * @return \Drupal\Core\Entity
- *   The entity object from the other endpoint.
+ * @return \Drupal\Core\Entity\EntityInterface|bool
+ *   The entity object from the other endpoint or FALSE.
  */
-function relation_get_related_entity($entity_type, $entity_id, $relation_type = NULL, $r_index = NULL) {
+function relation_get_related_entity($entity_type, $entity_id, $relation_type = NULL, $delta = NULL) {
 
   // Static cache the results of relation_query() and relation_load() to avoid
   // duplicate queries if this is called multiple times with the same arguments
   // during a request.
   $items = &drupal_static(__FUNCTION__);
   $request_key = "$entity_type:$entity_id";
-  $cache_key = "$request_key:$relation_type:$r_index";
+  $cache_key = "$request_key:$relation_type:$delta";
 
   if (isset($items[$cache_key])) {
     $entities = $items[$cache_key];
@@ -216,7 +216,7 @@ function relation_get_related_entity($entity_type, $entity_id, $relation_type = 
   }
   else {
     $query = Drupal::entityQuery('relation');
-    relation_query_add_related($query, $entity_type, $entity_id, $r_index)
+    relation_query_add_related($query, $entity_type, $entity_id, $delta)
       ->range(0, 1);
     if ($relation_type) {
       $query->condition('relation_type', $relation_type);
@@ -241,17 +241,20 @@ function relation_get_related_entity($entity_type, $entity_id, $relation_type = 
     $items[$cache_key] = $entities;
   }
   if ($entities) {
-    $first_entity_key = $entities[0]->entity_type . ':' . $entities[0]->entity_id;
-    if (isset($r_index)) {
-      $request_key = $request_key . ':' . $r_index;
-      $first_entity_key = $first_entity_key . ':' . $entities[0]->r_index;
+    $first_entity_key = $entities[0]->target_type . ':' . $entities[0]->target_id;
+    if (isset($delta)) {
+      $request_key = $request_key . ':' . $delta;
+      $first_entity_key .= ':0';
     }
     if ($request_key == $first_entity_key) {
-      $storage_handler = \Drupal::entityTypeManager()->getStorage($entities[1]->entity_type);
-      return $storage_handler->load($entities[1]->entity_id);
+      return \Drupal::entityTypeManager()
+        ->getStorage($entities[1]->target_type)
+        ->load($entities[1]->target_id);
     }
-    $storage_handler = \Drupal::entityTypeManager()->getStorage($entities[0]->entity_type);
-    return $storage_handler->load($entities[0]->entity_id);
+    return \Drupal::entityTypeManager()
+      ->getStorage($entities[0]->target_type)
+      ->load($entities[0]->target_id);
+
   }
 
   return FALSE;
@@ -277,7 +280,7 @@ function relation_entity_delete(EntityInterface $entity) {
     foreach (Relation::loadMultiple($relation_ids) as $relation) {
       // Remove any endpoints pointing to entity.
       foreach ($relation->endpoints as $key => $endpoint) {
-        if ($endpoint->entity_id == $entity->id() && $endpoint->entity_type == $entity->getEntityTypeId()) {
+        if ($endpoint->target_id == $entity->id() && $endpoint->target_type == $entity->getEntityTypeId()) {
           unset($relation->endpoints[$key]);
         }
       }
@@ -311,23 +314,64 @@ function relation_add_endpoint_field(RelationTypeInterface $relation_type) {
   $instance = FieldConfig::loadByName('relation', $relation_type->id(), RELATION_FIELD_NAME);
 
   if (empty($field)) {
-    $field = FieldStorageConfig::create(array(
+    $field = FieldStorageConfig::create([
       'field_name' => RELATION_FIELD_NAME,
       'entity_type' => 'relation',
       'cardinality' => FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED,
-      'type' => 'relation_endpoint',
+      'type' => 'dynamic_entity_reference',
       'locked' => TRUE,
-    ));
+      'settings' => [
+        // DER puts these two here, NOT on the instance. So instead we need to
+        // allow all possible entity types on the field storage entity as
+        // instances are added, and ensure the bundles validation on the
+        // instances is sufficient.
+        'exclude_entity_types' => TRUE,
+        'entity_type_ids' => [],
+      ],
+    ]);
     $field->save();
   }
 
   if ($field && empty($instance)) {
+    $settings = [];
+    // Handle directional relations differently, if they are going to be
+    // supported with DER generally?
+    foreach ($relation_type->getBundles() as $selected_entity_type => $selected_bundles) {
+      // Either patch DER to allow '*' in some way (e.g. allow no bundles to be
+      // selected, to mean all bundle), or subscribe to bundle creation &
+      // bundle rename events in order to add them then if this setting is *.
+      // Also, default field settings, which will include all existing content
+      // entity types, will be merged with our $settings array, so this will not
+      // sufficiently restrict the allowed entity types. A rethink is therefore
+      // needed.
+      $settings[$selected_entity_type]['handler'] = "default:$selected_entity_type";
+      foreach ($selected_bundles as $selected_bundle) {
+        if ($selected_bundle === '*') {
+          // If 'target_bundles' is NULL, all bundles are referenceable.
+          $settings[$selected_entity_type]['handler_settings']['target_bundles'] = NULL;
+        }
+        else {
+          $settings[$selected_entity_type]['handler_settings']['target_bundles'][$selected_bundle] = $selected_bundle;
+        }
+      }
+    }
+
+    // For all the entity types that are not selected in the relation type set
+    // the target bundle to an empty array since then no bundle is
+    // referenceable.
+    foreach (\Drupal::service('entity_type.repository')->getEntityTypeLabels() as $id => $label) {
+      if (!isset($settings[$id])) {
+        $settings[$id]['handler'] = "default:$id";
+        $settings[$id]['handler_settings']['target_bundles'] = [];
+      }
+    }
+
     // Attach field instance.
     $instance = FieldConfig::create(array(
       'field_storage' => $field,
       'bundle' => $relation_type->id(),
       'label' => t('Endpoints'),
-      'settings' => array(),
+      'settings' => $settings,
     ));
     $instance->save();
 
@@ -342,7 +386,7 @@ function relation_add_endpoint_field(RelationTypeInterface $relation_type) {
       ));
     }
     $entity_form_display->setComponent(RELATION_FIELD_NAME, array(
-      'type' => 'relation_endpoint',
+      'type' => 'dynamic_entity_reference_default',
     ))->save();
 
     // Display settings.
@@ -357,7 +401,7 @@ function relation_add_endpoint_field(RelationTypeInterface $relation_type) {
     }
     $display->setComponent(RELATION_FIELD_NAME, array(
       'label' => 'hidden',
-      'type' => 'relation_endpoint',
+      'type' => 'dynamic_entity_reference_label',
     ))->save();
   }
 }

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\relation\Form\RelationDeleteConfirm.
- */
-
 namespace Drupal\relation\Form;
 
 use Drupal\Core\Entity\ContentEntityConfirmFormBase;
@@ -17,6 +12,7 @@ use Drupal\Core\Form\FormStateInterface;
  * Provides a form for relation deletion.
  */
 class RelationDeleteConfirm extends ContentEntityConfirmFormBase {
+
   /**
    * {@inheritdoc}
    */
