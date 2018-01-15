@@ -14,6 +14,7 @@ require_once dirname(__FILE__) . '/relation.ctools.inc';
 function relation_entity_info() {
   $entities['relation'] = array(
     'label' => t('Relation'),
+    'label callback' => 'relation_label',
     'base table' => 'relation',
     'revision table' => 'relation_revision',
     'fieldable' => TRUE,
@@ -732,6 +733,15 @@ function relation_delete_multiple($rids) {
     $endpoints = field_get_items('relation', $relation, 'endpoints');
     relation_clear_related_entities_cache($endpoints);
   }
+}
+
+/**
+ * Gets a relation's label.
+ *
+ * @see entity_label()
+ */
+function relation_label($relation) {
+  return t('Relation !id', array('!id' => $relation->rid));
 }
 
 /**
