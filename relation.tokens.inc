@@ -100,7 +100,7 @@ function relation_tokens($type, $tokens, array $data = array(), array $options =
           break;
 
         case 'relation_type':
-          $replacements[$original] = $sanitize ? check_plain($relation->relation_type) : $relation->type;
+          $replacements[$original] = $sanitize ? check_plain($relation->relation_type) : $relation->relation_type;
           break;
 
         case 'type-name':
