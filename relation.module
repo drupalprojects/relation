@@ -670,6 +670,10 @@ function relation_save($relation, $account = NULL) {
   module_invoke('rules', 'invoke_event', 'relation_' . $op, $relation);
   relation_clear_related_entities_cache($endpoints);
 
+  // Clear internal properties.
+  unset($relation->is_new);
+  unset($relation->original);
+
   return $relation->rid;
 }
 
